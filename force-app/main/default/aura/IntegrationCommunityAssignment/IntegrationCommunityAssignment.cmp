@@ -1,0 +1,168 @@
+<!-- <aura:component controller="CommunityAssignmentController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="usernameLabel" type="String" required="false" default="Username"/>
+    <aura:attribute name="passwordLabel" type="String" required="false" default="Password"/>
+    <aura:attribute name="loginButtonLabel" type="String" required="false" default="Log in"/>
+    <aura:attribute name="expid" type="String" required="false" description="The branding experience ID" />        
+    
+    <aura:attribute name="forgotPasswordLabel" type="String" required="false" default="Forgot your password?"/>
+    <aura:attribute name="selfRegisterLabel" type="String" required="false" default="Not a member?"/>
+    <aura:attribute name="forgotPasswordUrl" type="String" required="false" default="/ForgotPassword"/>
+    <aura:attribute name="selfRegisterUrl" type="String" required="false" default="/SelfRegister"/>
+    
+    <aura:attribute name="isUsernamePasswordEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="isSelfRegistrationEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="communityForgotPasswordUrl" type="String" access="private"/>
+    <aura:attribute name="communitySelfRegisterUrl" type="String" access="private"/>
+    
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+     Please uncomment
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/>
+    <aura:handler event="c:setExpId" action="{!c.setExpId}"/>    
+    <aura:dependency resource="c:setExpId" type="EVENT"/>  
+    
+    <div>
+        <aura:renderIf isTrue="{!v.isUsernamePasswordEnabled}">
+            <span>
+                <aura:renderIf isTrue="{!v.showError}">
+                    <div id="error">
+                        <ui:outputRichText value="{!v.errorMessage}"/>
+                    </div>
+                </aura:renderIf>
+            </span>            
+            <div id="sfdc_username_container" class="sfdc">
+                <span id="sfdc_user" class="login-icon" data-icon="a"></span>
+                <ui:inputText value="" aura:id="username" placeholder="{!v.usernameLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc" label="{!v.usernameLabel}" labelClass="assistiveText"/>
+            </div>
+    
+            <div id="sfdc_password_container" class="sfdc">
+                <span id="sfdc_lock" class="login-icon sfdc" data-icon="c"></span>
+                <ui:inputSecret value="" aura:id="password" placeholder="{!v.passwordLabel}" keyup="{!c.onKeyUp}" class="input sfdc_passwordinput sfdc" label="{!v.passwordLabel}" labelClass="assistiveText"/>
+            </div>
+    
+            <div class="sfdc">
+                <ui:button aura:id="submitButton" label="{!v.loginButtonLabel}" press="{!c.handleLogin}" class="sfdc_button"/>
+            </div>
+            
+            <div id="sfdc_forgot" class="sfdc">
+                <span><a href="{!if(v.communityForgotPasswordUrl == null, v.forgotPasswordUrl, v.communityForgotPasswordUrl)}">{!v.forgotPasswordLabel}</a></span>
+                <aura:renderIf isTrue="{!v.isSelfRegistrationEnabled}">
+                    <span style="float:right" ><a href="{!if(v.communitySelfRegisterUrl == null, v.selfRegisterUrl, v.communitySelfRegisterUrl)}">{!v.selfRegisterLabel}</a></span>
+                </aura:renderIf>                            
+            </div> 
+        </aura:renderIf>
+    </div>    
+</aura:component>	 -->
+<aura:component controller="CommunityAssignmentController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+<!-- REQUIRED SLDS CSS -->
+<!-- <ltng:require styles="/resource/SLDS24/styles/salesforce-lightning-design-system.css"/> -->
+<!-- Username and Password -->
+<aura:attribute name="Username" type="String" />
+<aura:attribute name="Password" type="String" />
+<aura:attribute name="ResetUsername" type="String" />
+<aura:attribute name="mylabel" type="String"/>
+<aura:attribute name="mylabel1" type="String"/>
+<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+<aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+<!--create a component attributs -->
+<aura:attribute name="Spinner" type="boolean" default="false"/>
+<aura:attribute name="isVisible" type="boolean" default="true"/>
+<!--loading spinner start... style=Brand Medium (blue dots)-->
+<aura:if isTrue="{!v.Spinner}">
+<div aura:id="spinnerId" class="slds-spinner_container">
+<div class="slds-spinner--brand slds-spinner slds-spinner--large slds-is-relative" role="alert">
+<span class="slds-assistive-text">Loading</span>
+<div class="slds-spinner__dot-a"></div>
+<div class="slds-spinner__dot-b"></div>
+</div>
+</div>
+</aura:if>
+<!-- Loading spinner end-->
+<!-- PAGE HEADER -->
+        <lightning:layout class="slds-page-header slds-page-header--object-home">
+        <lightning:layoutItem >
+        <lightning:icon iconName="standard:household" size="large" alternativeText="Login Page"/>
+</lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+<div class="page-section page-header">
+<!-- <h1> <img src="{!$Resource.logo}"/></h1> -->
+<h1> <img style="width: 15rem;" src="https://www.briskminds.com/assets/img/bg/logo-bg.png"/></h1>
+
+</div>
+</lightning:layoutItem>
+</lightning:layout>
+<!-- / PAGE HEADER -->
+<!-- NEW FORM -->
+        <lightning:layout >
+        <lightning:layoutItem padding="around-small" size="12" class="main-wrapper">
+<div aria-labelledby="newform">
+<!-- BOXED AREA -->
+<fieldset class="slds-box slds-theme--default slds-container--medium">
+<legend id="newform" class="slds-text-heading--small
+slds-p-vertical--medium login-heading">
+</legend>
+<!-- IF Condition -->
+<aura:if isTrue="{!v.isVisible}">
+<div id="error">
+<ui:outputRichText value="{!v.mylabel}"/></div>
+<!-- CREATE NEW FORM -->
+<form class="slds-form--stacked">
+        <lightning:input aura:id="FormVal" label="Username"
+name="Username"
+type="email"
+placeholder="Enter your Username"
+value="{!v.Username}"
+required="true" />
+        <lightning:input aura:id="FormVal" label="Password"
+name="password"
+type="password"
+placeholder="Enter your Password"
+value="{!v.Password}"
+required="true"/>
+        <lightning:button label="Login"
+class="slds-m-top--medium"
+variant="brand"
+onclick="{!c.getInput}"/>
+        <lightning:button label="Reset"
+class="slds-m-top--medium"
+variant="brand"
+onclick="{!c.resetPass}"/>
+</form>
+<!-- / CREATE NEW FORM -->
+<aura:set attribute="else">
+<!-- Else Part Start-->
+<!-- CREATE NEW FORM -->
+<form class="slds-form--stacked">
+<!-- Reset Password code -->
+<div id="error1">
+<ui:outputRichText value="{!v.mylabel1}"/></div>
+    <lightning:input aura:id="FormReset" label="Username"
+name="Username"
+type="email"
+placeholder="Enter your Username"
+value="{!v.ResetUsername}"
+required="true" />
+        <lightning:button label="Reset"
+class="slds-m-top--medium"
+variant="brand"
+onclick="{!c.submitresetPass}"/>
+        <lightning:button label="Cancel"
+class="slds-m-top--medium"
+variant="brand"
+onclick="{!c.CancelReset}"/>
+</form>
+</aura:set>
+<!-- Else Part End -->
+</aura:if></fieldset>
+<!-- / BOXED AREA --></div>
+<!-- / CREATE NEW FORM -->
+</lightning:layoutItem>
+</lightning:layout>
+<!-- / NEW FORM -->
+</aura:component>

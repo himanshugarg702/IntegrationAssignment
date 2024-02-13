@@ -1,0 +1,31 @@
+<apex:page controller="Practice12">
+    <apex:form >
+    	pex:form >
+ <apex:pageBlock title="WrapperClass">
+ <apex:pageBlockSection title="Record List with additional field">
+ <apex:pageBlockTable value="{!Record}" var="list">
+ <apex:column headerValue="Select Record">
+ <apex:inputCheckbox value="{!list.MyCheck}"/>
+ </apex:column>
+<apex:repeat value="{!ListIteration}" var="itr">
+ <apex:column value="{!list.NestObj[itr]}"/>
+ </apex:repeat>
+ </apex:pageBlockTable>
+ </apex:pageBlockSection>
+ <apex:commandButton action="{!SelectedRecord}" value="Get Selected" reRender="SelectList"/>
+ </apex:pageBlock>
+        <apex:pageBlock title="Selected Record" id="SelectList">
+ <apex:pageBlockSection title="Selected Record List">
+ <apex:pageBlockTable value="{!SelectedList}" var="list">
+ <apex:column headerValue="Selected Record">
+ <apex:inputCheckbox value="{!list.MyCheck}"/>
+ </apex:column>
+<apex:repeat value="{!ListIteration}" var="itr">
+ <apex:column value="{!list.NestObj[itr]}"/>
+ </apex:repeat>
+ </apex:pageBlockTable>
+ </apex:pageBlockSection>
+ </apex:pageBlock>
+
+    </apex:form>
+</apex:page>

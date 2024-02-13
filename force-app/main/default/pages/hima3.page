@@ -1,0 +1,11 @@
+<apex:page controller="FieldSelectorController">
+
+    <apex:form >
+        <apex:selectList value="{!availableObjects}" size="1" label="Select Object">
+            <apex:selectOption itemValue="{!null}" itemLabel="-- Choose Object --" />
+        </apex:selectList>
+
+    
+    </apex:form>
+
+</apex:page>

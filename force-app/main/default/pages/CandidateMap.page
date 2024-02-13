@@ -1,0 +1,95 @@
+<apex:page standardcontroller="Position__c">
+
+    <p>This map shows the locations of candidates who have 
+       applied for the {!Position__c.Name} position.</p>
+
+    <!-- For development use only.
+         Add a Google API key to use in production. See 
+         https://developers.google.com/maps/documentation/javascript/tutorial 
+         for details of how to obtain a Google API key. -->
+    <apex:includeScript value="https://maps.googleapis.com/maps/api/js"/>
+    
+    <script type="text/javascript">
+        var applicants = [];
+        var countApplicantsGeocoded = 0;
+        var map;
+        var mapBoundary;
+        var geocoder;
+        var applicantInfoPanel = new google.maps.InfoWindow();
+        
+        function loadMap() {
+            var mapCanvas = document.getElementById('{!$Component.mapContainer}');
+            var mapOptions = {
+                center: { lat: 40, lng: -95 },
+                zoom: 4,
+                maxZoom: 10,
+                scrollwheel: false
+            };
+            map = new google.maps.Map(mapCanvas, mapOptions);
+            mapBoundary = new google.maps.LatLngBounds();
+                   
+            loadApplicants();
+            plotApplicantMarkers();
+        }
+        
+        // Convert applicants from sObjects to JavaScript objects
+        function loadApplicants() {
+            <apex:repeat value="{!Position__c.Job_Applications__r}" var="jobApp">
+                applicants.push({ 
+                    name: "{!JSENCODE(jobApp.Candidate__r.First_Name__c + ' ' + 
+                                     jobApp.Candidate__r.Last_Name__c)}",
+                    address: "{!JSENCODE(jobApp.Candidate__r.Street__c  + ', ' + 
+                                        jobApp.Candidate__r.City__c + ', ' + 
+                                        jobApp.Candidate__r.State_Province__c)}",
+                    viewLink: "{!JSENCODE(LINKTO(jobApp.Candidate__r.First_Name__c + 
+                                           ' ' + jobApp.Candidate__r.Last_Name__c, 
+                                        $Action.Candidate__c.View, 
+                                        jobApp.Candidate__c))}"
+                });
+            </apex:repeat>
+        }
+        
+        // Place markers on the map for each applicant
+        function plotApplicantMarkers() {
+            geocoder = new google.maps.Geocoder();
+            for(var idex = 0 ; idex < applicants.length ; idex++) {
+                geocodeAndCreateMarker(applicants[idex]);
+            }
+        }
+        
+        // Convert address to lat & long, and create actual marker
+        function geocodeAndCreateMarker(applicant) {
+            geocoder.geocode({'address':applicant.address},function(results, status){
+
+                countApplicantsGeocoded++;
+
+                // Add marker for geocoded address
+                if(status == google.maps.GeocoderStatus.OK) {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location,
+                    });
+                    mapBoundary.extend(marker.position);
+                    
+                    google.maps.event.addListener(marker, 'click', function() {
+                        applicantInfoPanel.setContent(applicant.viewLink + 
+                            "<br/>\n" + applicant.address);
+                        applicantInfoPanel.open(map, marker);
+                    });
+                }
+                
+                // If we're done geocoding, re-center and zoom the map
+                if(countApplicantsGeocoded >= applicants.length) {
+                    map.fitBounds(mapBoundary);
+                }
+            });
+        }
+        
+        google.maps.event.addDomListener(window, 'load', loadMap);
+    </script>
+
+    <apex:outputPanel layout="block" id="mapContainer" style="height: 400px">
+        Loading map...
+    </apex:outputPanel>
+
+</apex:page>

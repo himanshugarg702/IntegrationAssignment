@@ -1,0 +1,40 @@
+<apex:page controller="Assignment3VisualForce">
+     <apex:form >
+        <apex:pageBlock title="Accounts Lists">
+            <apex:pageBlockSection id="filterData" >
+                <apex:outputLabel value="Filters: "  >
+                <apex:selectList value="{!selectedOption}" size="1" multiselect="false" >
+                    <apex:actionSupport event="onchange" action="{!seeDataAccordingToFilter}" rerender="table"/>
+                     <apex:selectOption itemLabel="All Accounts" itemValue="AllAccounts"  />
+                    <apex:selectOption itemLabel="My Accounts" itemValue="MyAccounts" />
+                </apex:selectList>
+                    </apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="save" disabled="{!hideButton}"/>
+	            <apex:commandButton action="{!quickSave}" value="QuickSave" disabled="{!hideButton}"/>
+                 <apex:commandButton action="{!editMode}"    value="Edit" disabled="{!hideButtonEdit}"/>
+                 <apex:commandButton action="{!cancel}"   value="Cancel" disabled="{!hideButton}"/>
+            </apex:pageBlockButtons>
+           
+                <apex:pageBlockTable value="{!acc}" var="cont" id="table">
+                       <apex:column headerValue="Name">
+             	<apex:outputField value="{!cont.Name}" rendered="{!Not(editable)}" />
+                <apex:inputField value="{!cont.Name}"  rendered="{!editable}" />
+                        </apex:column>
+                        <apex:column headerValue="Industry">
+                <apex:outputField value="{!cont.Industry}"  rendered="{!Not(editable)}"/>
+                <apex:inputField value="{!cont.Industry}" rendered="{!editable}"/>
+                             </apex:column>
+                                <apex:column headerValue="Rating">
+                <apex:outputField value="{!cont.Rating}"  rendered="{!Not(editable)}"/>
+                <apex:inputField value="{!cont.Rating}" rendered="{!editable}"/>
+                                     </apex:column>
+                                       <apex:column headerValue="Id">
+                <apex:outputField value="{!cont.id}"/>
+                                            </apex:column>
+                    </apex:pageBlockTable>
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

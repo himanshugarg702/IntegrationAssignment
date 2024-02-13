@@ -1,0 +1,23 @@
+<aura:component controller="CommunityAssignmentController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="contactName" type="String" access="PRIVATE"/>   <!-- list for getting all object from apex -->
+    <aura:attribute name="userName" type="String" access="PRIVATE"/>   <!-- list for getting all object from apex -->
+    <aura:attribute name="userId" type="String" access="PRIVATE"/>
+    <aura:attribute name="profilePic" type="String" access="PRIVATE"/>   <!-- list for getting all object from apex -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <div>
+
+        <div>
+
+        </div>
+        <div>
+            <div>
+                <h1>Contact Name- </h1>
+                <p>Welcome {!v.contactName}</p>
+                <h1>User Name- </h1>
+                <p> {!v.userName}</p>
+                <h1>User Id- </h1>
+                <p> {!v.userId}</p>
+            </div>
+        </div>
+    </div>
+</aura:component>

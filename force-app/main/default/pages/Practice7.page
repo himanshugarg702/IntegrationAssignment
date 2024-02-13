@@ -1,0 +1,40 @@
+<apex:page standardController="Job_Application__c">
+    <apex:pageBlock title="Owner">
+    	<apex:pageBlockSection title="Owner Detail">
+            <p>Job Application Detail is -(Owner) :{!Job_Application__c.Owner}</p>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+     <apex:pageBlock title="Job Application">
+    	<apex:pageBlockSection title="Record Detail">
+            <p>Job Application Detail is-(Name): {!Job_Application__c.Name}</p>
+ <p>Job Application Detail is-(Total Rating):{!Job_Application__c.Total_Rating__c}</p>
+ <p>Job Application Detail is-(Number of Revier):{!Job_Application__c.Number_of_Reviews__c}</p>
+ <p>Job Application Detail is-(Avarage Rating): {!Job_Application__c.Average_Rating__c}</p>
+ <p>Job Application Detail is-(Status): {!Job_Application__c.Status__c}</p>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <apex:pageBlock title="Master Object">
+    	<apex:pageBlockSection title="Candidate Object Detail">
+              <p>Job Application Detail is-(Master-Candidate-Name): {!Job_Application__c.Candidate__r.Name}</p>
+               <p>Job Application Detail is-(Master Candidate-City): {!Job_Application__c.Candidate__r.City__c}</p>
+ <p>Job Application Detail is-(Master CandidateCountry):{!Job_Application__c.Candidate__r.Country__c}</p>
+ <p>Job Application Detail is-(Master Candidate-Email):{!Job_Application__c.Candidate__r.Email__c}</p>
+ <p>Job Application Detail is-(Master Candidate-First
+Name):{!Job_Application__c.Candidate__r.First_Name__c}</p>
+ <p>Job Application Detail is-(Master Candidate-First
+Name):{!Job_Application__c.Candidate__r.Last_Name__c}</p>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Position Object Detail">
+         <p>Job Application Detail is-(Master Position-Open
+Date):{!Job_Application__c.Position__r.Open_Date__c}</p>
+ <p>Job Application Detail is-(Master Position-Close
+Date):{!Job_Application__c.Position__r.Close_Date__c}</p>
+ <p>Job Application Detail is-(Master Position-Hire
+By):{!Job_Application__c.Position__r.Hire_By__c}</p>
+ <p>Job Application Detail is-(Master Position-Hire
+By):{!Job_Application__c.Position__r.Min_Pay__c}</p>
+ <p>Job Application Detail is-(Master Position-Hire
+By):{!Job_Application__c.Position__r.Max_Pay__c}</p>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:page>

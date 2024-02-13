@@ -1,0 +1,30 @@
+<apex:page controller="Practice13" showHeader="false" sidebar="false">
+   
+ <apex:form >
+ <apex:pagemessages />
+ <apex:pageBlock >
+
+ <apex:pageBlockSection title="Upload file In Notes & Attachmant" columns="2">
+<apex:pageBlockSectionItem >
+ <apex:outputLabel value="Select File" for="inputFile"/>
+ <apex:inputFile value="{!fileBody}" fileName="{!fileName}" id="inputFile" title="SELECT
+FILE"/>
+ </apex:pageBlockSectionItem>
+ <apex:commandButton action="{!AddToList}" value="AddToList" />
+ <!--comment start
+ <apex:pageBlockSectionItem >
+ <apex:outputLabel value="Description" for="description"/>
+<apex:inputTextarea value="{!fileDescription}" id="description"/>
+ </apex:pageBlockSectionItem>
+ comment end-->
+
+ </apex:pageBlockSection>
+
+ <apex:pageBlockButtons >
+ <apex:commandButton action="{!UploadFile}" value="Upload"/>
+ </apex:pageBlockButtons>
+
+ </apex:pageBlock>
+
+ </apex:form>
+</apex:page>

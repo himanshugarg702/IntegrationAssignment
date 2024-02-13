@@ -1,0 +1,13 @@
+<apex:page standardController="Position__c" >
+    <apex:pageBlock title="Position Record">
+        <apex:pageMessages />
+    	<apex:pageBlockSection >
+        	<apex:form >
+                Name:<apex:inputField value="{!Position__c.name}"/><br/>
+                Min Pay:<apex:inputField value="{!Position__c.Min_Pay__c}"/><br/>
+                Max Pay:<apex:inputField value="{!Position__c.Max_Pay__c}"/><br/>                                                  
+            	<apex:commandButton action="{!save}" value="save"/>
+            </apex:form>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:page>

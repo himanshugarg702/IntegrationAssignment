@@ -1,0 +1,10 @@
+<apex:page controller="Practice3" >
+    <apex:pageBlock title="Practice3">
+    	<apex:pageBlockSection title="Practice3 Record">
+        	<apex:pageBlockTable value="{!contactList}" var="item">
+            	<apex:column value="{!item.FirstName}"/>
+                <apex:column value="{!item.LastName}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,138 @@
+<apex:page controller="AssignmentPagination" >
+    <script>
+    function parentCheckBox(istrue){
+        let parent=document.querySelectorAll('.parent');
+        let childs=document.querySelectorAll('.child');
+        if(istrue.checked==true){
+            for(let i=0;i<childs.length;i++){
+                childs[i].checked=true;    
+            }
+        }
+        if(istrue.checked==false){
+            for(let i=0;i<childs.length;i++){
+                childs[i].checked=false;    
+            }
+        }
+    }
+    function childCheckBox(istrue){
+        var parent=document.querySelectorAll('.parent');
+        var count=0;
+        var childs=document.querySelectorAll('.child');
+        if(istrue.checked==true ){
+            for(let i=0;i<childs.length;i++){
+                if(childs[i].checked==true){
+                    count++;
+                }
+                if(count==childs.length){
+                    parent[0].checked=true;
+                }
+            }
+        }
+        if(istrue.checked==false ){
+            parent[0].checked=false;
+        }
+    }
+    
+    </script>
+    <style>
+        .spinnerBg{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: #000;
+        opacity: 0.1;
+        }
+        .spinner{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-image: url("/img/loading32.gif");
+        background-size: 56px;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        opacity: 1;
+        }
+    </style>
+    <apex:form id="formId" >
+        <apex:pageMessages id="msg"/>
+        <div align="right">
+            <apex:panelGrid >
+                <apex:repeat value="{!alphaList}" var="alph">
+                    <apex:commandLink value="{!alph} | " action="{!alphaSearch}" reRender="formId">
+                        <apex:param name="a" value="{!alph}" assignTo="{!alphaSearchConct}"/>
+                    </apex:commandLink>
+                </apex:repeat>
+            </apex:panelGrid>
+        </div>
+        <apex:actionStatus id="pageStatus">
+            <apex:facet name="start">
+                <div class="spinnerBg" />
+                <div class="spinner" />
+            </apex:facet>
+        </apex:actionStatus>
+        <apex:pageBlock title="Accounts Lists" id="pageBlock1">
+            <apex:pageBlockTable value="{!acc}" var="cont"  id="table">
+                <apex:column headerValue="Name">
+                    <apex:facet name="header">
+                        <apex:inputCheckbox styleClass="parent" onchange="parentCheckBox(this);"/>
+                    </apex:facet>
+                    <apex:inputCheckbox styleClass="child" onchange="childCheckBox(this);"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">   
+                        <apex:commandLink action="{!ViewData}" value="Name{!IF(sortExpression=='name',IF(sortDirection='ASC','▲','▼'),'')}" reRender="formId">
+                            <apex:param value="name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!cont.Name}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">   
+                        <apex:commandLink action="{!ViewData}" value="Industry{!IF(sortExpression=='name',IF(sortDirection='ASC','▲','▼'),'')}" reRender="formId">
+                            <apex:param value="Industry" name="column" assignTo="{!sortExpression}" ></apex:param>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!cont.Industry}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">   
+                        <apex:commandLink action="{!ViewData}" value="Rating{!IF(sortExpression=='name',IF(sortDirection='ASC','▲','▼'),'')}" reRender="formId">
+                            <apex:param value="Rating" name="column" assignTo="{!sortExpression}" ></apex:param>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!cont.Rating}"/>
+                </apex:column>
+                <apex:column headerValue="Id">
+                    <apex:outputField value="{!cont.id}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <table style="width: 100%" id="table2"><tr>
+                <td>
+                    Page:<apex:outputText value=" {!PageNumber} of {! CEILING(ResultSize / LimitSize) }" id="pages"  />
+                </td>
+                <td align="center" >
+                    <apex:commandButton value="First Page" rerender="table,pages,table2,pageBlock1" action="{!FirstPage}" status="pageStatus" disabled="{!PageNumber<=1}" />
+                    <apex:commandButton value="Previous" rerender="table,pages,table2,pageBlock1" action="{!previous}" status="pageStatus" disabled="{!PageNumber<=1}"  />
+                    <apex:commandButton value="Next" rerender="table,pages,table2,pageBlock1" action="{!next}" status="pageStatus" disabled="{!PageNumber==CEILING(ResultSize / LimitSize)}"/>
+                    <apex:commandButton value="Last Page" rerender="table,pages,table2,pageBlock1" action="{!LastPage}" status="pageStatus" disabled="{!PageNumber==CEILING(ResultSize / LimitSize)}"/>
+                </td>
+                <td align="right">
+                    Records per page:
+                    <apex:selectList value="{!selectedOption}" size="1">
+                        <apex:actionSupport event="onchange" action="{!seeDataAccordingToRecordPerPage}" reRender="table,pages,pageBlock1"/>
+                        <apex:selectOption itemValue="5" itemLabel="5"/>
+                        <apex:selectOption itemValue="10" itemLabel="10"/>
+                        <apex:selectOption itemValue="15" itemLabel="15"/>
+                        <apex:selectOption itemValue="20" itemLabel="20"/>
+                        <apex:selectOption itemValue="25" itemLabel="25"/>
+                        
+                    </apex:selectList>
+                </td>
+                </tr></table>
+            
+            
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

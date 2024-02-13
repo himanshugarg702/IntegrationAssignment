@@ -1,0 +1,23 @@
+<apex:page controller="Assignment2AccountButtons" >
+    <apex:form >
+        <apex:pageBlock >
+              <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="save" disabled="{!hideButton}"/>
+	            <apex:commandButton action="{!quickSave}" value="QuickSave" disabled="{!hideButton}"/>
+                 <apex:commandButton action="{!editMode}"    value="Edit" disabled="{!hideButtonEdit2}"/>
+                 <apex:commandButton action="{!deleteMode}" value="Delete" disabled="{!hideButtonEdit}"/>
+                 <apex:commandButton action="{!cancel}"   value="Cancel" disabled="{!hideButton}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="updateData">
+             	<apex:outputField value="{!acc.Name}" rendered="{!Not(editable)}" />
+                <apex:inputField value="{!acc.Name}"  rendered="{!editable}" />
+                <apex:outputField value="{!acc.Industry}"  rendered="{!Not(editable)}"/>
+                <apex:inputField value="{!acc.Industry}" rendered="{!editable}"/>
+                <apex:outputField value="{!acc.Rating}"  rendered="{!Not(editable)}"/>
+                <apex:inputField value="{!acc.Rating}" rendered="{!editable}"/>
+                <apex:outputField value="{!acc.id}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

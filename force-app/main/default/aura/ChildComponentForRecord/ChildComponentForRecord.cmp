@@ -1,0 +1,14 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name='record' type='Object'/>
+    <aura:attribute name='fieldName' type='String'/>
+    <aura:attribute name='fieldValue' type='String'/>
+    <aura:handler name="init" value="{!this}" action="{!c.check}" />
+    
+    <!-- <b>{!v.fieldName}-</b>{!v.fieldValue} -->
+    <!-- {!v.fieldValue} -->
+    <td>
+
+        <div class="slds-truncate" title="{!v.fieldName}"  ><b>{!v.fieldName}-</b>{!v.fieldValue}</div>
+    </td>
+
+</aura:component>

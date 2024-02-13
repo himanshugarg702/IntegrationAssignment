@@ -1,0 +1,101 @@
+<aura:component controller="KanBanViewAssignment" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="allObject" type="List" access="PRIVATE"/>   <!-- list for getting all object from apex -->
+    <aura:attribute name="allField" type="List"  description="fields"  default="[]" />  <!--list for getting all field depending on the object-->
+    <aura:attribute name="selectedObject" type="String" access="PRIVATE"/>  <!--variable for getting field on the basis on selected object from apex-->
+    <aura:attribute name="selectedField" type="List" default="[]" />  <!-- list of getting selected field in second pickList  -->
+    <aura:attribute name="requiredOptions" type="List" default="[Name]" />  <!-- list of getting selected field in second pickList  -->
+
+    <aura:attribute name="selectedFieldsValue" type="String"  />  <!-- list of getting selected field value for query in second pickList -->
+    <aura:attribute name="allPickListField" type="List"  description="fields"   access="PRIVATE" />
+    <aura:attribute name="selectedPickListField" type="String"  access="PRIVATE"/>  <!-- list of getting selected field value for query in second pickList -->
+    <aura:attribute name="totalCountValue" type="Integer"  default="0"/>  <!-- list of getting selected field value for query in second pickList -->
+    <aura:attribute name="totalCountValueRecords" type="List"  default="[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="kanbanData" type="KanBanViewAssignment.KanbanViewWrapperClass" default="[]" />
+    <aura:attribute name="kanbanDataShow" type="Boolean" default="false" />
+
+    <!-- <div class="exampleHolder">
+        <aura:if isTrue="{! v.loaded }">
+            <aura:set attribute="else">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:set>
+        </aura:if>
+    </div> -->
+    <div style="display: flex; flex-direction:column;" class="slds-grid slds-gutters slds-p-around_medium"> 
+        <div class="slds-col slds-size_1-of-2"> 
+            <span>
+                <lightning:select name="objects" label="Select a Object" aura:id="objectId" value="{!v.selectedObject}" onchange="{!c.handleChange}">
+                    <option value="">choose one...</option>
+                    <aura:iteration items="{!v.allObject}" var="object">
+                        <option text="{!object.value}" value="{!object.key}" selected="{!object.selected}"/>
+                    </aura:iteration>
+                </lightning:select>
+            </span>
+        </div>
+        <aura:if isTrue="{!v.selectedObject}">
+            <div class="slds-col slds-size_1-of-2">
+                <span>
+                    <lightning:select name="colorId" label="Select a Field For Showing KanBan:" aura:id="colorId" value="{!v.selectedPickListField}" onchange="{!c.handleToGetPickListField}">
+                        <aura:iteration items="{!v.allPickListField}" var="option">
+                            <option text="{!option.value}" value="{!option.key}" selected="{!option.selected}" aura:id="pickListApi" data-tit="{!option.value}" />
+                        </aura:iteration>
+                    </lightning:select>
+
+                    <aura:if isTrue="{! !empty(v.allField)}">
+                        <lightning:dualListbox aura:id="fieldId"
+                        name="Genre"
+                        label="Select Genre"
+                        sourceLabel="Available Genre"
+                        selectedLabel="Selected Genre"
+                        options="{!v.allField }"
+                        requiredOptions="{!v.requiredOptions}"
+                        max="4"
+                        value="{!v.selectedFieldsValue}"
+                        onchange="{!c.handleToChangeSelectedField}"/>
+                        <div style="margin-top: 2%;">
+                            <lightning:button  
+                                variant="brand" 
+                                label="Process" 
+                                onclick="{!c.processTable}" />
+                        </div>
+                    </aura:if>
+                </span>
+            </div>
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!v.kanbanDataShow==true}">
+        <div class="slds-scrollable_x" style="background-color: white;">
+        <div class="slds-grid">
+        <!-- <aura:iteration var="pickVal" items="{!v.kanbanData.pickValues}"> -->
+            <aura:iteration var="pickVal" items="{!v.totalCountValueRecords}">
+                <div class="slds-path">
+                    <div class="slds-grid slds-path__track">
+                      <div class="slds-grid slds-path__scroller-container">
+                        <div class="slds-path__scroller">
+                          <div class="slds-path__scroller_inner">
+                            <ul style="width: 25rem;" class="slds-path__nav" role="listbox" aria-orientation="horizontal" aria-labelledby="slds-path__stage-name">
+                              <li class="slds-path__item slds-is-current slds-is-active" role="presentation">
+                                <a aria-selected="true" class="slds-path__link" href="#" id="path-1" role="option" tabindex="0">
+                                  <span class="slds-path__stage">
+                                  </span>
+                                  <span class="slds-path__title">{!pickVal.label} - {!pickVal.count}</span>
+                                </a>
+                              </li>
+                              </ul>
+                
+                <ul ondrop="{!c.drop}" ondragover="{!c.allowDrop}" class="slds-has-dividers_around-space dropZone" data-Pick-Val="{!pickVal.label}" style="height:70vh;overflow-y:auto;">
+                    <aura:iteration var="objRecord" items="{!v.kanbanData.records}">
+                        <c:KanBanChildComponent record = '{!objRecord}' pickValue = '{!pickVal.label}' apiFieldName="{!v.selectedPickListField}"  selectedFields="{!v.selectedField}" />
+                    </aura:iteration>
+                </ul>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>
+      
+        </aura:iteration>
+           </div>
+      </div>
+       </aura:if>
+</aura:component>

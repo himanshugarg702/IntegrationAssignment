@@ -1,0 +1,36 @@
+<apex:page controller="Practice8">
+    <apex:form >
+    <apex:pageBlock >
+		
+        	<apex:pageBlockSection >
+                <apex:dataList value="{!LMN}" var="list">
+                    <apex:outputText value="{!list}"/>
+                </apex:dataList>
+            </apex:pageBlockSection>
+            <apex:commandButton action="{!Page1}" value="Click me" rerender="block1"/>
+     
+    </apex:pageBlock>
+           </apex:form>  
+    <apex:form >
+    <apex:pageBlock >
+		
+        	<apex:pageBlockSection >
+                <apex:dataList id="block1" value="{!ABC}" var="list">
+                    <apex:outputText value="{!list}"/>
+                </apex:dataList>
+            </apex:pageBlockSection>
+            <apex:commandButton action="{!Page2}" value="Click me" rerender="block2"/>
+          	
+    </apex:pageBlock>
+         </apex:form> 
+    <apex:form >
+    <apex:pageBlock >
+		
+        	<apex:pageBlockSection >
+                <apex:dataList id="block2" value="{!XYZ}" var="list">
+                    <apex:outputText value="{!list}"/>
+                </apex:dataList>
+            </apex:pageBlockSection>   	
+    </apex:pageBlock>
+         </apex:form> 
+</apex:page>

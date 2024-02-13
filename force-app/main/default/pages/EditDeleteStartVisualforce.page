@@ -1,0 +1,77 @@
+<apex:page controller="EditDeleteStartVisualforce">
+    <style>
+        .spinnerBg{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: #000;
+        opacity: 0.1;
+        }
+        .spinner{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-image: url("/img/loading32.gif");
+        background-size: 56px;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        opacity: 1;
+        }
+    </style>
+    <apex:form id="table">
+        <div align="right">
+        <apex:panelGrid >
+            <apex:repeat value="{!alphaList}" var="alph">
+                <apex:commandLink value="{!alph} | " action="{!getalphaSearch}" reRender="table">
+                <apex:param name="a" value="{!alph}" assignTo="{!alphaSearchConct}"/>
+                </apex:commandLink>
+                </apex:repeat>
+        </apex:panelGrid>
+    </div>
+        <apex:actionStatus id="pageStatus">
+            <apex:facet name="start">
+                <div class="spinnerBg" />
+                <div class="spinner" />
+            </apex:facet>
+        </apex:actionStatus>
+        <apex:pageBlock title="Accounts Lists">
+            <apex:pageMessages id="msg"/>
+            <apex:pageBlockTable value="{!accWrap}" var="cont" >
+                
+                <apex:column headerValue="Action">
+                    <apex:commandLink value="Edit" rendered="{!Not(cont.checkStatus)}" reRender="table" status="pageStatus">&nbsp;|&nbsp;
+                        <apex:param name="cid" value="true" assignTo="{!cont.checkStatus}"/>
+                    </apex:commandLink>
+                    <apex:commandLink action="{!deleteMode}" value="Delete" rendered="{!Not(cont.checkStatus)}" reRender="table,msg" status="pageStatus">
+                        <apex:param name="del" value="{!cont.acc.id}" assignTo="{!accId}"/>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="Name" >
+                    <apex:outputField value="{!cont.acc.Name}" rendered="{!Not(cont.checkStatus)}"/>
+                    <apex:inputField value="{!cont.acc.Name}"  rendered="{!cont.checkStatus}" />
+                </apex:column>
+                <apex:column headerValue="Industry">
+                    <apex:outputField value="{!cont.acc.Industry}"  rendered="{!Not(cont.checkStatus)}"/>
+                    <apex:inputField value="{!cont.acc.Industry}" rendered="{!cont.checkStatus}"/>
+                </apex:column>
+                <apex:column headerValue="Rating">
+                    <apex:outputField value="{!cont.acc.Rating}"  rendered="{!Not(cont.checkStatus)}"/>
+                    <apex:inputField value="{!cont.acc.Rating}" rendered="{!cont.checkStatus}"/>
+                </apex:column>
+                <apex:column headerValue="Id">
+                    <apex:outputField value="{!cont.acc.id}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:commandButton action="{!save}" value="save" rendered="{!(cont.checkStatus)}" reRender="table" status="pageStatus">
+                        <apex:param name="save" value="{!cont.acc.id}" assignTo="{!accId}"/>
+                    </apex:commandButton>
+                    <apex:commandButton value="Cancel" rendered="{!(cont.checkStatus)}" reRender="table" immediate="true" status="pageStatus">
+                        <apex:param name="cancel" value="false" assignTo="{!cont.checkStatus}"/>
+                    </apex:commandButton>
+                </apex:column>
+            </apex:pageBlockTable>
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,45 @@
+<apex:page controller="AddToCart">
+    <apex:form >
+        <apex:pageBlock title="Merchandise">
+            <apex:pageBlockSection title="Record List View">
+            	<apex:pageBlockTable value="{!Record}" var="item">
+                	<apex:column headerValue="Name">
+                    	 <apex:outputText value="{!item.Name}"/>
+                     </apex:column>
+                    <apex:column headerValue="Description">
+                    	 <apex:outputText value="{!item.Description}"/>
+                     </apex:column>
+                    <apex:column headerValue="Price">
+                    	 <apex:outputText value="{!item.Price}"/>
+                     </apex:column>
+                    <apex:column headerValue="Stock Available">
+                    	 <apex:outputText value="{!item.Stock}"/>
+                     </apex:column>
+                    <apex:column headerValue="QtyToBuy">
+                    	 <apex:inputText value="{!item.QtyToBuy}"/>
+                     </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+             <apex:commandButton action="{!addCart}" value="Add To cart" reRender="cart" />
+        </apex:pageBlock>
+    </apex:form>
+      <apex:form >
+        <apex:pageBlock title="Cart List" id="cart">
+            	<apex:pageBlockTable value="{!cartList}" var="item">
+                	<apex:column headerValue="Name">
+                    	 <apex:outputText value="{!item.Name}"/>
+                     </apex:column>
+                    <apex:column headerValue="Description">
+                    	 <apex:outputText value="{!item.Description}"/>
+                     </apex:column>
+                    <apex:column headerValue="Price">
+                    	 <apex:outputText value="{!item.Price}"/>
+                     </apex:column>
+                    <apex:column headerValue="QtyToBuy">
+                    	 <apex:inputText value="{!item.QtyToBuy}"/>
+                     </apex:column>
+                </apex:pageBlockTable>
+             <apex:commandButton value="Shop To cart" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,109 @@
+<aura:component controller="AuraPaginationAssignment" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <!-- Attributes -->
+    <aura:attribute name="allObject" type="List" access="PRIVATE"/>
+    <aura:attribute name="allField" type="List"  description="fields"  default="[]" />
+    <aura:attribute name="selectedObject" type="String" access="PRIVATE"/>
+    <aura:attribute name="selectedField" type="List" default="[]" />
+    <aura:attribute name="selectedFieldsValue" type="List" default="[]" />
+
+    <aura:attribute name="tableColumns" type="List" default="[]" />
+    <aura:attribute name="sObjectList" type="sObject[]"  />
+    <aura:attribute name="PageNumber" type="integer" default="1"/>
+    <aura:attribute name="TotalPages" type="integer" default="0"/>
+    <aura:attribute name="TotalRecords" type="integer" default="0"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortDirection" type="String"/>
+    <aura:attribute name="loaded" type="Boolean" default="true" />
+    <aura:attribute name="maintainCheckBox" type="List" default="[]" />
+
+
+    <!-- <lightning:button label="Toggle" variant="brand" onclick="{! c.handleClick }" /> -->
+
+   
+    <!--Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <!-- <div class="exampleHolder">
+        <aura:if isTrue="{! v.loaded }">
+            <aura:set attribute="else">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:set>
+        </aura:if>
+    </div> -->
+  
+    <div style="display: flex; flex-direction:column;" class="slds-grid slds-gutters slds-p-around_medium"> 
+        <div class="slds-col slds-size_1-of-2"> 
+            <span>
+                <lightning:select name="objects" label="Select a Object" aura:id="objectId" value="{!v.selectedObject}" onchange="{!c.handleChange}">
+                    <option value="">choose one...</option>
+                    <aura:iteration items="{!v.allObject}" var="object">
+                        <option text="{!object.value}" value="{!object.key}" selected="{!object.selected}"/>
+                    </aura:iteration>
+                </lightning:select>
+            </span>
+        </div>
+        <aura:if isTrue="{!v.selectedObject}">
+            <div class="slds-col slds-size_1-of-2">
+                <span>
+                   <lightning:dualListbox aura:id="fieldId"
+                        name="Genre"
+                        label="Select Genre"
+                        sourceLabel="Available Genre"
+                        selectedLabel="Selected Genre"
+                        options="{!v.allField }"
+                        value="{!v.selectedFieldsValue}"
+                        onchange="{!c.handleToChangeSelectedField}"/>
+                        <aura:if isTrue="{! !empty(v.selectedField)}">
+                            <div style="margin-top: 2%;">
+                                <lightning:button  
+                                    variant="brand" 
+                                    label="Process" 
+                                    onclick="{!c.processTable}" />
+                            </div>
+                        </aura:if>
+                </span>
+            </div>
+        </aura:if>
+    </div>
+    <aura:if isTrue="{! !empty(v.tableColumns)}">
+        <div>
+            <p style="font-size: 2rem;" >Total Records : {!v.TotalRecords}</p>
+            <div style="height: 300px">
+                <!-- <lightning:layout multipleRows="true" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" size="12">         -->
+                <lightning:datatable
+                    data="{! v.sObjectList }"
+                    columns="{! v.tableColumns }"
+                    keyField="id"
+                    onheaderaction="{! c.handleHeaderAction }"
+                    sortedBy="{!v.sortBy}"
+                    sortedDirection="{!v.sortDirection}"
+                    onsort="{!c.handleSort}"/>
+                <!-- </lightning:layoutItem>       
+            </lightning:layout>    -->
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="slds-float_right" style="font-size: 2rem;"  >
+                <ui:inputSelect aura:id="pageSize" label="Display Records Per Page: " change="{!c.pageRecordChange}">
+                    <ui:inputSelectOption text="5" label="5" value="true"/>
+                    <ui:inputSelectOption text="10" label="10"/>
+                    <ui:inputSelectOption text="15" label="15"/>
+                    <ui:inputSelectOption text="20" label="20"/>
+                    <ui:inputSelectOption text="50" label="50"/>
+
+                </ui:inputSelect>
+                <br/>
+            </div>
+            <div>            
+                <lightning:button disabled="{!v.PageNumber == 1}" variant="brand" aura:id="prevPage" label="First Page" onclick="{!c.pageRecordChange}" />            
+                <lightning:button disabled="{!v.PageNumber == 1}" variant="brand" aura:id="prevPage" label="Prev" onclick="{!c.handlePrev}" />            
+                <lightning:button disabled="{!v.PageNumber == v.TotalPages}" aura:id="nextPage" variant="brand" label="Next" onclick="{!c.handleNext}"/>
+                <lightning:button disabled="{!v.PageNumber == v.TotalPages}" aura:id="nextPage" variant="brand" label="Last Page" onclick="{!c.handleLastPage}"/>
+                
+            </div>
+            <div>
+                <p style="font-size: 2rem;" >Page {!v.PageNumber} of {!v.TotalPages}</p>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

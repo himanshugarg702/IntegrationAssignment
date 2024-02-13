@@ -1,0 +1,16 @@
+<apex:page sidebar="false" showHeader="false" standardController="Position__c" recordSetVar="position">
+    <apex:form >
+    <apex:pageBlock title="Position">
+    	<apex:pageBlockButtons >
+        	<apex:commandButton action="{!save}" value="Update Inventory"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Position List">
+            <apex:pageBlockTable value="{!position}" var="list">
+                <apex:column value="{!list.Name}"/>
+                <apex:column value="{!list.Status__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+        </apex:form>
+</apex:page>

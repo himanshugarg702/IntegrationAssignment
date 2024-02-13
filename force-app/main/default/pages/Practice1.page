@@ -1,0 +1,17 @@
+<apex:page standardController="Account" recordSetVar="record">
+    <apex:form >
+    	<apex:pageBlock title="Account">
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+            	<apex:commandButton action="{!Save}" value="Save"/>
+                <apex:commandButton action="{!Cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>	
+            <apex:pageBlockSection title="Create Record" >
+                <apex:inputField value="{!Account.Name}"/>
+                 <apex:inputField value="{!Account.Site}"/>
+                 <apex:inputField value="{!Account.Phone}"/>
+                 <apex:inputField value="{!Account.Rating}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

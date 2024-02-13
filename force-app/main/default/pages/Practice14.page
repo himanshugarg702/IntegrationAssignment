@@ -1,0 +1,41 @@
+<apex:page standardController="Merchandise__c" extensions="Practice14">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" />
+<script type="text/javascript">
+function getPageData()
+{
+ console.log('hellooooooooooo');
+ var
+merchandiseName=$('[id$="name"]').val();//document.getElementById('{!$Component.block.section.name}').value;
+ console.log('========'+merchandiseName);
+ var merchandiseDescription= $('[id$="description"]').val();//document.getElementById('description').value;
+ var merchandisePrice= $('[id$="price"]').val();//document.getElementById('price').value;
+ var merchandiseInventory= $('[id$="inventory"]').val();//document.getElementById('inventory').value;
+ Practice14.getData(merchandiseName, merchandiseDescription, merchandisePrice, merchandiseInventory,
+ function(r,e)
+ {
+ console.log('========'+r)
+ });
+}
+</script>
+ <apex:form >
+ <apex:pageBlock id="block" title="Merchandise">
+
+ <apex:pageMessages />
+
+ <apex:pageBlockButtons >
+ <apex:commandButton value="Save" onclick="getPageData();return false ;"/>
+ <apex:commandButton action="{Cancel}" value="Cancel"/>
+ </apex:pageBlockButtons>
+
+ <apex:pageBlockSection id="section" title="Create Record">
+ <apex:inputField id="name" value="{!Merchandise__c.Name}"/>
+ <apex:inputField id="description" value="{!Merchandise__c.Job_Description__c}"/>
+ <apex:inputField id="price" value="{!Merchandise__c.Price__c}"/>
+ <apex:inputField id="inventory" value="{!Merchandise__c.Merchandise_Inventory__c}"/>
+ </apex:pageBlockSection>
+
+ </apex:pageBlock>
+
+ </apex:form>
+
+</apex:page>

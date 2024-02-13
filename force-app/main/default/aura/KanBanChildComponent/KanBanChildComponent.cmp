@@ -1,0 +1,36 @@
+<aura:component controller="KanBanViewAssignment">
+    <aura:attribute name='record' type='Object'/><!-- variable for getting records -->
+    <aura:attribute name='pickValue' type='String'/><!-- variable for picklist value which is showing for records -->
+    <aura:attribute name='fieldValue' type='String'/><!-- for showing records -->
+    <aura:attribute name='selectedFields' type='List' /><!-- variable for getting from parent component selected fields list -->
+
+    <aura:attribute name='totalCount' type='Integer' /><!--  -->
+    <aura:attribute name="totalRecordsPickValue" type="Map" default="{pickValue:null,totalCount:0}"/><!--  -->
+    <!-- <aura:attribute name="map" type="Map" default="{str1:null,str2:null,obj:null}"/> -->
+    <aura:attribute name='apiFieldName' type='String'/><!-- corresponsing picklist field for getting records -->
+    <aura:attribute name='nameField' type='String' default="Name" /><!-- dafault field for getting anchor tag -->
+
+    
+    <aura:handler name="init" value="{!this}" action="{!c.check}"/>
+    <aura:if isTrue="{!v.pickValue == v.fieldValue}"> 
+         <li class="slds-item slds-m-around_small" draggable="true" ondragstart="{!c.drag}" id="{!v.record.Id}" style="width: 24rem;background-color: white;">
+            <article class="slds-tile slds-tile_board">
+                <h3 style="font-weight: bold;" class="slds-truncate" title="{!v.record.Name}">
+                    Name- 
+                    <a href="{!'/' + v.record.Id}" target="_blank" draggable="false">
+                        <span class="slds-truncate" id="{!v.record.Id}"> {!v.record.Name}</span>
+                    </a>
+                </h3>
+                <div style="width: 20rem;" class="slds-tile__detail slds-text-body_small">
+                    <aura:iteration var="field" items="{!v.selectedFields}">
+                    <p  >
+                        <aura:if isTrue="{!field != v.nameField}"> 
+                        <c:ChildComponentForRecord record='{!v.record}' fieldName='{!field}'/>
+                        </aura:if>
+                    </p>
+                        </aura:iteration>
+                </div>
+            </article>
+        </li>
+     </aura:if> 
+</aura:component>

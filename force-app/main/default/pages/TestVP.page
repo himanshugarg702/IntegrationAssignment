@@ -1,0 +1,9 @@
+<apex:page controller="TestApex">
+   <apex:form >
+    	<apex:pageBlock title="Visual Force Page">
+       	{!x}
+            <apex:inputField value="{!con.LastName}"/>
+            <apex:commandButton action="{!save}" value="save"/>
+       </apex:pageBlock>
+    </apex:form>
+</apex:page>

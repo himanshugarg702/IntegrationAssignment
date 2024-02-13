@@ -1,0 +1,12 @@
+<apex:page controller="ObjectFieldSelectionController">
+    <apex:form >
+        <apex:selectList value="{!selectedObject}" size="1">
+            <apex:selectOptions value="{!objectOptions}" />
+            <apex:actionSupport event="onchange" action="{!loadFields}" rerender="fieldPicklist" />
+        </apex:selectList>
+
+        <apex:selectList id="fieldPicklist" value="{!selectedFields}" size="5" multiselect="true">
+            <apex:selectOptions value="{!fieldOptions}" />
+        </apex:selectList>
+    </apex:form>
+</apex:page>

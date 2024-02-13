@@ -1,0 +1,43 @@
+<apex:page >
+    <script>
+        function parentCheckBox(istrue){
+                let parent=document.querySelectorAll('.parent');
+                let childs=document.querySelectorAll('.child');
+                if(istrue.checked==true){
+                    for(let i=0;i<childs.length;i++){
+                        childs[i].checked=true;    
+                    }
+                }
+                if(istrue.checked==false){
+                    for(let i=0;i<childs.length;i++){
+                        childs[i].checked=false;    
+                    }
+                }
+       }
+    function childCheckBox(istrue){
+        	var parent=document.querySelectorAll('.parent');
+           var count=0;
+           var childs=document.querySelectorAll('.child');
+             if(istrue.checked==true ){
+              for(let i=0;i<childs.length;i++){
+              	 if(childs[i].checked==true){
+                    count++;
+                 }
+                  if(count==childs.length){
+                  	    parent[0].checked=true;
+                  }
+              }
+             }
+               if(istrue.checked==false ){
+                     parent[0].checked=false;
+              }
+             }
+    
+    </script>
+
+    <apex:form >
+        <apex:pageBlock >
+           
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

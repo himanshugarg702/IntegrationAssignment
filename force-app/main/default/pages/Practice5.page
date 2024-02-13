@@ -1,0 +1,17 @@
+<apex:page sidebar="false" showHeader="false" standardController="Position__c" recordSetVar="Record">
+    <apex:pageBlock title="Positions">
+    	<apex:form >
+        	<apex:dataList value="{!Record}" var="list">
+            	<apex:commandLink reRender="detail">
+                	{!list.Name}
+                    <apex:param name="coid" value="{!list.id}"/>
+                </apex:commandLink>
+            </apex:dataList>
+        </apex:form>
+    </apex:pageBlock>
+    <apex:pageBlock title="Record Detail">
+    	<apex:outputPanel id="detail">
+        	<apex:detail subject="{!$CurrentPage.parameters.coid}" relatedList="false" title="false"/>
+        </apex:outputPanel>
+    </apex:pageBlock>
+</apex:page>

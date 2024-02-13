@@ -1,0 +1,102 @@
+<!--
+Name:Visualforce Page
+Description:In this visualforce page getting objects and fields related to objects and calling component.
+-->
+
+
+<apex:page controller="PaginationVisualforceClass" sidebar="false">
+    <apex:actionStatus id="pageStatus">
+        <apex:facet name="start">
+            <div class="spinnerBg"/>
+            <div class="spinner"/>
+        </apex:facet>
+    </apex:actionStatus>
+    
+    <style>
+        .fields{
+        height:250px;
+        width:300px;
+        }
+        .spinnerBg{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: #000;
+        opacity: 0.1;
+        }
+        .spinner{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-image: url("/img/loading32.gif");
+        background-size: 56px;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        opacity: 1;
+        }
+        <!--.data{
+            width:100%;
+            overflow-x: scroll;
+        }
+.column{
+width:10%;
+}-->
+        .datatable{
+        width:400px;
+        height:40px;
+        }
+    </style>
+    
+    
+    <apex:form id="form" style="background: white; border: none; width:100%; overflow:auto;">
+        <apex:pageBlock >
+            <div style="display:flex;width:80%;  ">
+                <apex:outputLabel value=" Select Objects"  style=" font-size: 1.3rem; margin-right:2%; font-weight: bold;" />       
+                
+                <apex:selectList value="{!selectedObject}" size="1" style="width:30%;">
+                    <apex:selectOptions value="{!resultsObjects}"/>
+                    <apex:actionSupport reRender="form,he,comp" event="onchange" status="pageStatus"  action="{!FieldOptions}" />
+                </apex:selectList>
+                <apex:commandButton action="{!resetValueAction}" value="Reset" reRender="form,comp" disabled="{!reset}" status="pageStatus" style="margin-left: 2%; padding: 0.5rem " />
+            </div>
+            <div style="border:transparent;">
+                <apex:pageBlock rendered="{!IF(selectedObject!=NULL,true,false)}" id="obj2">
+                    <div style=" background: white !important;  border: none;  justify-content: space-around; display: flex; flex-direction: row;">
+                        <div style="display: flex; flex-direction: column;">
+                        <apex:outputLabel value="{!selectedObject}: Fields" style="font-size: 1rem; font-weight: bold;"/>           
+                        <apex:selectList value="{!selectedField}" styleClass="fields" multiselect="true">
+                            <apex:selectOptions value="{!results}"/>
+                        </apex:selectList>     
+                            </div>
+                        <div style="display: flex; flex-direction: column; margin-top: 7rem;">
+                            <apex:commandButton value="Add" action="{!SelectedFieldsToShow}" status="pageStatus"  reRender="form" style="height: 2rem; width: 3rem;  " disabled="{!add}" />
+                            <apex:commandButton value="Remove" action="{!SelectedFieldRemove}" disabled="{!remove}" reRender="form" status="pageStatus" style="height: 2rem; width: 3rem; " />
+                        </div>
+                         <div style="display: flex; flex-direction: column;">
+                            <apex:outputLabel value="Selected: Fields" style="font-size: 1rem; font-weight: bold;" />           
+                            <apex:selectList value="{!removeFields}"  styleClass="fields" multiselect="true">
+                                <apex:selectOptions value="{!result2}"/>
+                            </apex:selectList>
+                        </div>                      
+                        <apex:commandButton value="Process" action="{!processToComp}" disabled="{!remove}" reRender="he,hello,comp" status="pageStatus" oncomplete="callCmp();" style="height: 2rem; width: 3rem; margin-top: 8rem; "  />      
+                        
+                    </div>
+                </apex:pageBlock> 
+            </div>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:form id="comp"  >
+        <apex:outputPanel style="width:100%; height:auto; overflow:auto; " layout="block" >
+            <c:Assign1 obj="{!selectedObject}"  fields="{!result2}"  fieldsValues="{!valuesSendComponent}"  rendered="{!IF(processShow==false,true,false)}" /> 
+        </apex:outputPanel>
+    </apex:form>
+    <script>
+   
+    function callCmp(){
+    	objcheck();
+    }
+        
+    
+    </script>
+</apex:page>
