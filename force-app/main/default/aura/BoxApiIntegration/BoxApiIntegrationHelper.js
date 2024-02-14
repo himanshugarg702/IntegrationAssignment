@@ -5,10 +5,30 @@
             var status = response.getState();
             if(status === "SUCCESS"){
                 var authUrl = response.getReturnValue();
+                console.log('->url',authUrl);
+                // if(authUrl=='Authorize'){
+                //     // if(accessToken!=null){
+                //         var action  = component.get("c.getAllFilesFromGoogleDrive");
+                //         action.setCallback(this, function(response){
+                //             var status = response.getState();
+                //             if(status === "SUCCESS"){
+                //                 var filesData = response.getReturnValue();
+                //                 component.set('v.files',filesData);
+                                
+                //                 console.log('----------->',filesData);
+                //                 // window.location.href = response.getReturnValue();
+                //             }
+                //         });
+                        
+                //         $A.enqueueAction(action);
+                //     // }
+                // }
+                // else{
                 window.location.href = response.getReturnValue();
                 console.log(authUrl);
                 component.set('v.accessToken',authUrl);
                 component.set('v.disabled',false);
+                // }
             }
         });
         $A.enqueueAction(action);

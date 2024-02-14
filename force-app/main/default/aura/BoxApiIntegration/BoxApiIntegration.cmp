@@ -66,15 +66,28 @@
                     </td>
         <td >
             <!-- "{!'/' + v.record.Id} -->
-                <a href="{!file.alternativeLink}" target="_blank" style="cursor: pointer;" id="{!file.Id}" >{!file.name}</a>
+                <a href="{!file.alternativeLink}" style="cursor: pointer;" id="{!file.Id}" >{!file.name}</a>
         </td>
         <!-- <td>Open</td> -->
-        <td >
-            <a href="{!file.downLoadLink}">
-                <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   />
-            </a>
+        
+        <aura:if isTrue="{!file.mimiType!='folder'}" >
+        <td data-tit = "{!file.Id}" onclick="{!c.downLoadFile}">
+            <!-- <a href="{!file.downLoadLink}"> -->
+                    <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   />
+                <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
+            <!-- </a> -->
         </td>
-        <td data-tit = "{!file.Id}" onclick="{!c.deleteFile}">      
+    </aura:if>
+    <aura:if isTrue="{!file.mimiType=='folder'}">
+        <td>
+            not download
+            <!-- <a href="{!file.downLoadLink}"> -->
+                    <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
+                <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
+            <!-- </a> -->
+        </td>
+    </aura:if>
+        <td data-del = "{!file.Id}" onclick="{!c.deleteFile}" data-type = "{!file.mimiType}">      
             <lightning:icon iconName="action:delete" size="small" alternativeText="Approved" title="Approved" style="cursor: pointer;"/>
         </td>
         </tr>
@@ -85,8 +98,35 @@
         
         </table>
     </div>
+    <div style="display: flex; flex-direction: row;">
+        <lightning:button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick="{!c.createNewFolder}" ></lightning:button>
+        <lightning:fileUpload label="Attach receipt"
+        name="fileUploader"
+        multiple="true"
+        accept="{!v.filetype}"
+        recordId="{!v.recordId}"
+        onuploadfinished="{!c.handleUploadFinished}" style="margin-left: 1rem "/>
+    </div>
+    <!-- <lightning:card  variant="Narrow"  title="Box API For Create Folder" >
+        <div class="slds-var-p-around_small">
+            <lightning:layout >
+                <lightning:layoutItem  >
+                    <lightning:input name="newFolderName" class="fieldvalidate" type="text"
+                                     label="Folder Name" >
+                    </lightning:input><br/>
+                </lightning:layoutItem>
+ 
+                <lightning:layoutItem size="12" class="slds-var-p-top_small">
+                    <lightning:button class="slds-align_absolute-center" variant="brand" label="Create Folder"
+                        onclick="{!c.handleCreateFolder}"> 
+                    </lightning:button>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </lightning:card><br/> -->
+     
      <!-- Upload files card -->
-     <lightning:card  variant="Narrow"  title="Box API For Upload Files" >
+     <!-- <lightning:card  variant="Narrow"  title="Box API For Upload Files" >
         <div class="slds-var-p-around_small">
             <lightning:layout >
                 <lightning:layoutItem>
@@ -105,7 +145,7 @@
                 </lightning:layoutItem>
             </lightning:layout>
         </div>
-    </lightning:card>
+    </lightning:card> -->
     <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
     <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
 

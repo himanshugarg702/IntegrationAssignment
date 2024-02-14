@@ -4,20 +4,37 @@
     <aura:attribute name="userId" type="String" access="PRIVATE"/>
     <aura:attribute name="profilePic" type="String" access="PRIVATE"/>   <!-- list for getting all object from apex -->
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    <div>
+    <div style="display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: aqua;">
 
-        <div>
-
+        <div class="image" style="display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 1rem;">
+          <img style="max-width: 13rem;
+          height: 13rem;
+          border-radius: 50%;"  src="data:image/png;base64,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"/>
         </div>
-        <div>
+            <div style="font-size: 2rem;font-size: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2rem;">
+                <div>
+                <span>Contact Name- </span> <span>Welcome {!v.contactName}</span>
+            </div>
             <div>
-                <h1>Contact Name- </h1>
+                <span>User Name-  </span> <span>{!v.userName}</span>
+            </div>
+
+                <!-- <h1>Contact Name- </h1>
                 <p>Welcome {!v.contactName}</p>
                 <h1>User Name- </h1>
-                <p> {!v.userName}</p>
-                <h1>User Id- </h1>
-                <p> {!v.userId}</p>
+                <p> {!v.userName}</p> -->
+                <!-- <h1>User Id- </h1>
+                <p> {!v.userId}</p> -->
             </div>
-        </div>
     </div>
 </aura:component>

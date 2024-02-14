@@ -84,6 +84,23 @@
         
         // $A.enqueueAction(action);
     },
+    // handleCreateFolder:function(component, event, helper){
+    //     const inputValidation = [...this.template.querySelectorAll('.fieldvalidate')]
+    //         .reduce((validSoFar, inputField) => {
+    //             inputField.reportValidity();
+    //             return validSoFar && inputField.checkValidity();
+    //         }, true);
+    //     if (inputValidation) {
+    //      //perform success logic
+    //       let inputFields = this.template.querySelectorAll('.fieldvalidate');
+    //       inputFields.forEach(inputField => {
+    //         if(inputField.name == "newFolderName"){
+    //             this.newFolderName = inputField.value;
+    //         }
+    //        });
+    //        this.handleApexCallCreateFolder();
+    //     }
+    // },
     filesget : function(component, event, helper) {
         helper.getFiles(component,event,helper);
     },
@@ -100,6 +117,7 @@
         helper.getDeleteFile(component,event,helper);
         helper.getFiles(component,event,helper);
     },
+    
     handleUploadFinished: function(component, event, helper) {
             // var recordId=component.get('v.recordId');
             // console.log(recordId);
@@ -112,16 +130,21 @@
             
             var action  = component.get("c.uploadFile");
             action.setParams({
+                "name":uploadedFiles[0].name,
                 "attachmentId": attachmentId,
                 "accessToken" : code,
-                "name":uploadedFiles[0].name
+                "type":uploadedFiles[0].mimeType
             });
             action.setCallback(this, function(response){
                 var status = response.getState();
                 if(status === "SUCCESS"){
                     var responseCode = response.getReturnValue();
-                    if(responseCode == '200')
+                    if(responseCode == '200'){
                         alert('File Uploaded successfully');
+                        helper.getFiles(component,event,helper);
+
+                    }
+                    
                     else
                         alert('There was some error');
                 }
@@ -188,6 +211,30 @@
         // }
         // component.set("v.fileName", fileName);
     },
+    createNewFolder:function(component, event, helper) {
+        var prompt=window.prompt('Please enter Folder name');
+        console.log(prompt);
+        if(prompt!=null){
+        var action  = component.get("c.newFolder");
+        action.setParams({
+            "folderName": prompt
+        });
+        action.setCallback(this, function(response){
+            var status = response.getState();
+            if(status === "SUCCESS"){
+                var responseCode = response.getReturnValue();
+                if(responseCode == true){
+                    alert('Folder Created Successfully');
+                    helper.getFiles(component,event,helper);
+
+                }
+                else
+                    alert('There was some error');
+            }
+        });
+    }
+        $A.enqueueAction(action);
+    }
     // getAccessToken:function(component,event,helper) {
     //     console.log('code');
     //     var code = getParameterByName('code');

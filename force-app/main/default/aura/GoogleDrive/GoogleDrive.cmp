@@ -86,12 +86,14 @@
         </table>
     </div>
     <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
-    <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/>
-
-<!-- <lightning:fileUpload label="Attach receipt"
-    name="fileUploader"
-    multiple="true"
-    accept="{!v.filetype}"
-    recordId="{!v.recordId}"
-    onuploadfinished="{!c.handleUploadFinished}" /> -->
+    <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
+    <div style="display: flex; flex-direction: row;">
+        <lightning:button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick="{!c.createNewFolder}" ></lightning:button>
+        <lightning:fileUpload label="Attach receipt"
+        name="fileUploader"
+        multiple="true"
+        accept="{!v.filetype}"
+        recordId="{!v.recordId}"
+        onuploadfinished="{!c.handleUploadFinished}" style="margin-left: 1rem "/>
+    </div>
 </aura:component>

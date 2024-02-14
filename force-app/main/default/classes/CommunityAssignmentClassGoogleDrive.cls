@@ -12,6 +12,10 @@ public class CommunityAssignmentClassGoogleDrive {
         // https://www.googleapis.com/auth/fitness.activity.read
         @AuraEnabled
         public static String createAuthURL() {
+            Integration__c integration=[Select id,Access_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Google Drive']; 
+            // integration.Access_Token__c;
+            String accessToken=integration.Access_Token__c;
+            // if(accessToken==null){
             String key = EncodingUtil.urlEncode(key,'UTF-8');
             String uri = EncodingUtil.urlEncode(redirect_uri,'UTF-8');
             String authuri = '';
@@ -23,6 +27,10 @@ public class CommunityAssignmentClassGoogleDrive {
                 '&access_type=offline'+
                    '&prompt=consent';
             return authuri;
+            // }
+            // else{
+            //     return 'Authorize';
+            // }
         }
         
         @AuraEnabled
@@ -97,6 +105,31 @@ public class CommunityAssignmentClassGoogleDrive {
             // return true;
             return fileList;
 
+        }
+        @AuraEnabled
+        public static Boolean newFolder(String folderName) {
+            System.debug('hello');
+            System.debug(folderName);
+            Integration__c integration=[Select id,Access_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Google Drive']; 
+            // integration.Access_Token__c;
+            String accessToken=integration.Access_Token__c;
+            HttpRequest req = new HttpRequest();
+            req.setMethod('POST');     
+            req.setEndpoint('https://www.googleapis.com/drive/v2/files');
+            req.setHeader('Authorization', 'Bearer '+accessToken);
+            req.setHeader('content-type', 'application/json');
+            String body = '{"title" : "'+ folderName +'","mimeType" : "application/vnd.google-apps.folder"}';
+            req.setTimeout(60*1000);
+            req.setBody(body);
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            System.debug('===== Response==='+ res.getBody());
+            if(res.getStatusCode()==200){
+                return true;
+            }
+            else{
+                return false;
+            }
         }
         @AuraEnabled
         public static Boolean deleteFileApex(String StringID,String accessToken)
@@ -192,67 +225,112 @@ public class CommunityAssignmentClassGoogleDrive {
                 PageReference pageref = new PageReference(resp.getBody());
                  return pageref.getUrl();
             }
-        
             return null;
         }
-        // @AuraEnabled
-        // public static String uploadFile(String attachmentId, String accessToken,String name) {
-        //     System.debug('helloworld');
-        //     List<ContentVersion> cvFile = [SELECT VersionData,FileType,ContentDocumentId FROM ContentVersion WHERE ContentDocumentId =: attachmentId];
-        //     System.debug('hello');
-        //     System.debug(cvFile);
-        //     Blob myBlob = cvFile[0].VersionData;
-        //    String url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
-        //    string authorizationHeader = 'Bearer ' + accessToken; 
-        //    Integer contentSize = myBlob.size();
-        //    HttpRequest req = new HttpRequest();
-        //    req.setheader('Authorization',authorizationHeader);
-        //    req.setheader('Content-Length',String.valueOf(contentSize));
-        //     req.setheader('Content-Type','image/'+cvFile[0].FileType);//,'title/'+ name
-        //    req.setMethod('POST'); 
-        //    req.setEndpoint(url); 
-        //    req.setBodyAsBlob(myBlob); 
-        //    Http h = new Http(); 
-          
-        //    Httpresponse resp = h.send(req);
-        //    //After file was successfully upload we delete the file
-        //    delete new ContentDocument(Id = cvFile[0].ContentDocumentId);
-        //    return String.valueOf(resp.getStatuscode());
-        // }
         @AuraEnabled
-        public static String  uploadFile(String fileName, String accessToken,String fileContent) {
-              String boundary = '-------314159265358979323846';
-        String body = '--' + boundary + '\nContent-Disposition: form-data; name="file"; filename="' + fileName + '"\nContent-Type: application/octet-stream\n\n';
-        String endPoint = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart';
-        
-        HttpRequest req = new HttpRequest();
-        req.setMethod('POST');
-        req.setEndpoint(endPoint);
-        req.setHeader('Authorization', 'Bearer ' + accessToken);
-        req.setHeader('Content-Type', 'multipart/related; boundary=' + boundary);
-            String base64Content = (Blob.valueOf(body) + fileContent + Blob.valueOf('\n--' + boundary + '--'));
-			//Blob body = EncodingUtil.base64Decode(base64Content);
-		req.setBodyAsBlob(EncodingUtil.base64Decode(base64Content));
-      //  req.setBodyAsBlob(EncodingUtil.base64Decode(( String ) JSON.deserialize(Blob.valueOf(body) + fileContent + Blob.valueOf('\n--' + boundary + '--'))));
-        
-            System.debug(fileName);
-            System.debug(filecontent);
-       /*      String url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
-        String authorizationHeader = 'Bearer ' + accessToken; 
-        HttpRequest req = new HttpRequest();
-        req.setHeader('Authorization', authorizationHeader);
-        req.setHeader('Content-Type', 'application/octet-stream');
-        req.setMethod('POST'); 
-        req.setEndpoint(url); 
-        req.setBodyAsBlob(EncodingUtil.base64Decode(fileContent)); // Set the Blob content as the body directly*/
-        Http h = new Http(); 
-        HttpResponse resp = h.send(req);
-        
-        if (resp.getStatusCode() == 200) {
-            return 'File uploaded successfully';
-        } else {
-            throw new AuraHandledException('Error uploading file: ' + resp.getStatusCode() + ' ' + resp.getStatus());
+        public static String uploadFile(String name,String attachmentId, String accessToken,String type) {
+            System.debug('helloworld');
+            List<ContentVersion> cvFile = [SELECT VersionData,FileType,ContentDocumentId FROM ContentVersion WHERE ContentDocumentId =: attachmentId];
+            System.debug('hello');
+            System.debug(cvFile);
+            // String accessToken=integration.Access_Token__c;
+            // HttpRequest req = new HttpRequest();
+            // req.setMethod('POST');     
+            // req.setEndpoint('https://www.googleapis.com/drive/v2/files');
+            // req.setHeader('Authorization', 'Bearer '+accessToken);
+            // req.setHeader('content-type', 'application/json');
+            // String body = '{"title" : "'+ folderName +'","mimeType" : "application/vnd.google-apps.folder"}';
+            // req.setTimeout(60*1000);
+            // req.setBody(body);
+            Blob myBlob = cvFile[0].VersionData;
+           String url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart';
+           string authorizationHeader = 'Bearer ' + accessToken; 
+           Integer contentSize = myBlob.size();
+           HttpRequest req = new HttpRequest();
+           req.setheader('Authorization',authorizationHeader);
+           req.setheader('Content-Length',String.valueOf(contentSize));
+           String body = '{"title" : "'+ name+'","mimeType" : "image/jpeg"}';
+            // req.setheader('Content-Type','image/'+cvFile[0].FileType);//,'title/'+ name
+            req.setheader('Content-Type',+type);
+           req.setMethod('POST'); 
+           req.setEndpoint(url); 
+           req.setBodyAsBlob(myBlob); 
+           req.setBody(body);
+           Http h = new Http(); 
+          
+           Httpresponse resp = h.send(req);
+           //After file was successfully upload we delete the file
+        //    delete new ContentDocument(Id = cvFile[0].ContentDocumentId);
+           return String.valueOf(resp.getStatuscode());
         }
+
+        // public void retrieveGoogleAccessToken1(){
+        //     Http h = new Http();
+        //     HttpRequest req = new HttpRequest();
+        //     string endPointValue = 'https://accounts.google.com/o/oauth2/auth';   
+        //     req.setEndpoint(endPointValue);
+        
+        //     string bodyRequest = '';
+        
+        //     bodyRequest = 'client_id=' + EncodingUtil.urlEncode(googleClientID, 'UTF-8');
+        //     bodyRequest += '&client_secret=' + EncodingUtil.urlEncode(googleSecretCode, 'UTF-8');
+        //     bodyRequest += '&refresh_token=' + refreshToken;
+        //     bodyRequest += '&grant_type=refresh_token';
+        
+        //     req.setBody(bodyRequest);         
+        //     req.setHeader('Content-length', string.ValueOf(bodyRequest.length())); 
+        //     req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        //     req.setMethod('POST');
+        //     req.setTimeout(10000);
+        //     HttpResponse res = h.send(req);   
+        //     map<string, string> jsonValues = new map<string, string>();
+        
+        //     System.debug('Response Value:'+res.getBody());
+        //     jsonValues = parseJSONToMap(res.getBody());
+        //     if(jsonValues.containsKey('error')){ 
+        //     }else{
+        //         //Try to get a cell value in the Google Spreadsheet
+        //         accessToken = jsonValues.get('access_token');
+        //         //refreshToken = jsonValues.get('refresh_token');
+        //         //expiresIn = jsonValues.get('expires_in');
+        //         //tokenType = jsonValues.get('token_type'); 
+        
+        //     }     
+        // }
+    //     @AuraEnabled
+    //     public static String  uploadFile(String fileName, String accessToken,String fileContent) {
+    //           String boundary = '-------314159265358979323846';
+    //     String body = '--' + boundary + '\nContent-Disposition: form-data; name="file"; filename="' + fileName + '"\nContent-Type: application/octet-stream\n\n';
+    //     String endPoint = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart';
+        
+    //     HttpRequest req = new HttpRequest();
+    //     req.setMethod('POST');
+    //     req.setEndpoint(endPoint);
+    //     req.setHeader('Authorization', 'Bearer ' + accessToken);
+    //     req.setHeader('Content-Type', 'multipart/related; boundary=' + boundary);
+    //         String base64Content = (Blob.valueOf(body) + fileContent + Blob.valueOf('\n--' + boundary + '--'));
+	// 		//Blob body = EncodingUtil.base64Decode(base64Content);
+	// 	req.setBodyAsBlob(EncodingUtil.base64Decode(base64Content));
+    //   //  req.setBodyAsBlob(EncodingUtil.base64Decode(( String ) JSON.deserialize(Blob.valueOf(body) + fileContent + Blob.valueOf('\n--' + boundary + '--'))));
+        
+    //         System.debug(fileName);
+    //         System.debug(filecontent);
+    //    /*      String url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
+    //     String authorizationHeader = 'Bearer ' + accessToken; 
+    //     HttpRequest req = new HttpRequest();
+    //     req.setHeader('Authorization', authorizationHeader);
+    //     req.setHeader('Content-Type', 'application/octet-stream');
+    //     req.setMethod('POST'); 
+    //     req.setEndpoint(url); 
+    //     req.setBodyAsBlob(EncodingUtil.base64Decode(fileContent)); // Set the Blob content as the body directly*/
+    //     Http h = new Http(); 
+    //     HttpResponse resp = h.send(req);
+        
+    //     if (resp.getStatusCode() == 200) {
+    //         return 'File uploaded successfully';
+    //     } else {
+    //         throw new AuraHandledException('Error uploading file: ' + resp.getStatusCode() + ' ' + resp.getStatus());
+    //     }
        /*   System.debug('helloworld');
            String url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=media';
            string authorizationHeader = 'Bearer ' + accessToken; 
@@ -281,7 +359,7 @@ public class CommunityAssignmentClassGoogleDrive {
            //After file was successfully upload we delete the file
         //    delete new ContentDocument(Id = cvFile[0].ContentDocumentId);
         //    return String.valueOf(resp.getStatuscode());
-        }
+        // }
         // public PageReference downloadFile(FileWrapper file){
         //     if(file == null || file.webViewLink == null){
         //         return null;

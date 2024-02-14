@@ -13,8 +13,14 @@ public with sharing class CommunityBoxApiIntegration {
         private static string tokenUrl='https://account.box.com/oauth2/token';
         // https://briskminds-b3-dev-ed.develop.my.site.com/s
         // https://www.googleapis.com/auth/fitness.activity.read
+
         @AuraEnabled
         public static String createAuthURL() {
+            //Integration__c integration=[Select id,Access_Token__c,LastModifiedDate,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            // integration.Access_Token__c;
+            // String date=integration.LastModifiedBy;
+            //String accessToken=integration.Access_Token__c;
+            // if(accessToken==null){
             String key = EncodingUtil.urlEncode(key,'UTF-8');
             String uri = EncodingUtil.urlEncode(redirect_uri,'UTF-8');
             String authuri = '';
@@ -24,10 +30,40 @@ public with sharing class CommunityBoxApiIntegration {
                 '&scope='+scope+
                 '&redirect_uri='+uri+
                 '&access_type=offline'+
-                   '&prompt=consent';
+                '&prompt=consent';
             return authuri;
+            // }
+            // else{
+            //     // getAllFilesFromGoogleDrive();
+            //     return 'Authorize';
+            // }
         }
-        
+        @AuraEnabled
+        public static Boolean newFolder(String folderName) {
+            String parentFolderId='0';
+            System.debug('hello');
+            System.debug(folderName);
+            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            // integration.Access_Token__c;
+            String accessToken=integration.Access_Token__c;
+            HttpRequest req = new HttpRequest();
+            req.setMethod('POST');     
+            req.setEndpoint('https://api.box.com/2.0/folders');
+            req.setHeader('Authorization', 'Bearer '+accessToken);
+            req.setHeader('content-type', 'application/json');
+            String body = '{ "name": "' + folderName + '", "parent": { "id": "' + parentFolderId + '" } }';
+            req.setTimeout(60*1000);
+            req.setBody(body);
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            System.debug('===== Response==='+ res.getBody());
+            if(res.getStatusCode()==201){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
         @AuraEnabled
         public static String getAccessToken(String code)
         {
@@ -113,22 +149,102 @@ public with sharing class CommunityBoxApiIntegration {
             }
             // return true;
             return fileList;
-
+        }
+        private static AuraHandledException newMessageException(String message) {
+            AuraHandledException e = new AuraHandledException(message);
+            e.setMessage(message);
+            return e;
         }
         @AuraEnabled
-        public static Boolean deleteFileApex(String StringID,String accessToken)
-        {   
-            // Integration__c inte= MetadataService.accessToken;
-            //Getting access token from google
-            List<WrapperGoogleDrive> fileList=new List<WrapperGoogleDrive>();
+   public static String uploadFile(String base64, String filename, String folderId){
+    System.debug('hello world');
+        folderId='0';
+        Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            // integration.Access_Token__c;
+
+            String accessToken=integration.Access_Token__c;
+        // String accessToken = getAccessToken();
+        if(base64!=null){
+            
+            blob base64EncodeFile = base64EncodeFileContent(EncodingUtil.base64Decode(base64),filename);
+            String uploadEndPointURL='https://upload.box.com/api/2.0/files/content?parent_id='+folderId;
+            String boundary = '----------------------------741e90d31eff';
+            String body = '{"name":"' + filename + '", "parent":{"id":"' + folderId + '"}}';
             HttpRequest req = new HttpRequest();
-            req.setEndpoint('https://www.googleapis.com/drive/v2/files/'+StringID);
+            req.setBody(body);
+            req.setBodyAsBlob(base64EncodeFile);
+            req.setHeader('Content-Type','multipart/form-data; boundary='+boundary);
+            //req.setHeader('Content-Length',String.valueof(req.getBodyAsBlob().size()));
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setMethod('POST');
+            req.setEndpoint(uploadEndPointURL);
+            req.setTimeout(120000);
+            //Send request to Box
+            Http ht = new Http();
+            HTTPResponse res = ht.send(req);
+            System.debug('**Files upload Response: ' + res.getBody());
+            Integer uploadStatusCode=res.getStatusCode();
+            if(uploadStatusCode==201){
+                return 'File uploaded successfully.';
+            }else{
+              throw newMessageException('Error encountered. Status Code: ' + uploadStatusCode);                
+            }
+        }else{
+            throw newMessageException('Please select file.');
+        }
+   }
+   public static blob base64EncodeFileContent(Blob file_body, String file_name){
+    String boundary = '----------------------------741e90d31eff';
+    String header = '--'+boundary+'\nContent-Disposition: form-data; name="file"; filename="'+file_name+'";\nContent-Type: application/octet-stream';
+    String footer = '--'+boundary+'--';             
+    String headerEncoded = EncodingUtil.base64Encode(Blob.valueOf(header+'\r\n\r\n'));
+    while(headerEncoded.endsWith('='))
+    {
+        header+=' ';
+        headerEncoded = EncodingUtil.base64Encode(Blob.valueOf(header+'\r\n\r\n'));
+    }
+    String bodyEncoded = EncodingUtil.base64Encode(file_body);
+    Blob bodyBlob = null;
+    String last4Bytes = bodyEncoded.substring(bodyEncoded.length()-4,bodyEncoded.length());
+
+    if(last4Bytes.endsWith('==')) {
+        last4Bytes = last4Bytes.substring(0,2) + '0K';
+        bodyEncoded = bodyEncoded.substring(0,bodyEncoded.length()-4) + last4Bytes;
+        String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
+        bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);
+    } else if(last4Bytes.endsWith('=')) {
+        last4Bytes = last4Bytes.substring(0,3) + 'N';
+        bodyEncoded = bodyEncoded.substring(0,bodyEncoded.length()-4) + last4Bytes;
+        footer = '\n' + footer;
+        String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
+        bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);              
+    } else {
+        footer = '\r\n' + footer;
+        String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
+        bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);  
+    }
+
+    return bodyBlob;
+}
+        @AuraEnabled
+        public static Boolean deleteFileBox(String StringID,String fileType)
+        {   
+            fileType=fileType+'s';
+            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            System.debug(StringID);
+            String accessToken=integration.Access_Token__c;
+            // https://api.box.com/2.0/file_requests/:file_request_id
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint('https://api.box.com/2.0/'+fileType+'/'+StringID);
             req.setMethod('DELETE');
             req.setHeader('content-type', 'application/Json');
             req.setHeader('Authorization','Bearer '+accessToken);
+            req.setHeader('Accept', 'application/json');
+
             req.setTimeout(60*1000);
             Http http=new Http();
             HttpResponse response = http.send(req);
+            System.debug(response);
             if(response.getStatusCode()==204){
                 return true;
             }
@@ -186,31 +302,39 @@ public with sharing class CommunityBoxApiIntegration {
         // fileData
         // --BOUNDARY--
         @AuraEnabled
-        public static String downloadFile(String StringID,String accessToken){
+        public static String downloadFile(String StringID){
             //webContentLink
+            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            // integration.Access_Token__c;
+            System.debug(StringID);
+            String accessToken=integration.Access_Token__c;
             if(StringID == null){
                 return null;
             }
-        
+            System.debug(accessToken);
             Http http = new Http();
             HttpRequest req = new HttpRequest();
             req.setMethod('GET');
-            req.setEndpoint('https://www.googleapis.com/drive/v2/files/'+ StringID+'?alt=media');
+            req.setEndpoint('https://api.box.com/2.0/files/'+StringID+'/content');
             req.setHeader('Content-Type', 'application/json');
             req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Accept', 'application/json');
             req.setTimeout(60 * 1000);
             
             
             HttpResponse resp = null;
             resp = http.send(req);
+            System.debug(resp);
+            System.debug(resp.getHeader('location'));
+            return resp.getHeader('location');
             // Object test = resp.getBody();
-            System.debug('hello world');
-            if(resp.getStatusCode() == 200){
-                PageReference pageref = new PageReference(resp.getBody());
-                 return pageref.getUrl();
-            }
+            // System.debug('hello world');
+            // if(resp.getStatusCode() == 200){
+            //     PageReference pageref = new PageReference(resp.getBody());
+            //      return pageref.getUrl();
+            // }
         
-            return null;
+            // return null;
         }
         // @AuraEnabled
         // public static String uploadFile(String attachmentId, String accessToken,String name) {
