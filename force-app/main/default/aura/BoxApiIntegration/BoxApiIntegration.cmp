@@ -10,149 +10,87 @@
 <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <aura:attribute name="accessToken" type="String" />
     <aura:attribute name="access" type="String" />
-    <!-- <lightning:card title="SalesforceCodex Fitness">
-    	<lightning:button variant="brand" label="Authorize Google Fit" title="Authorize Google Fit" onclick="{! c.doAuth }" />
-        <p>
-            {!access}
-        </p>
-   	</lightning:card> -->
-       <!-- <lightning:button variant="brand" label="Authorize Google Fit" title="Authorize Google Fit" onclick="{! c.filesget }" /> -->
-     <!--  <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item" onclick="{!c.navigateRoot}">
-                    <span class="slds-icon_container slds-icon-utility-home">
-                        <lightning:icon iconName="utility:home" size="x-small"/>
-                    </span>
-                    <span class="slds-assistive-text">Home</span>
-                </li>
-                <aura:iteration items="{!v.files}" var="file">
-                    <li class="breadcrumb-item" onclick="{!c.navigateToFolder}">
-                        {!file.name}
-                    </li>
-                </aura:iteration>
-            </ol>
-       </nav>-->
-       <div style="margin-top: 2rem;">
-        <table >
+    <aura:attribute name="breadcrumbCollection" type="Object"/>
+    <aura:attribute name="breadCrumbFileId" type="String" default="0" />
+
+    <lightning:breadcrumbs>
+        <aura:iteration items="{! v.breadcrumbCollection }" var="breadcrumb">
+            <lightning:breadcrumb label="{! breadcrumb.label }" onclick="{! c.navigateTo }" id="{! breadcrumb.id }"/>
+            
+        </aura:iteration>
+    </lightning:breadcrumbs>
+       <div class="slds-scrollable_y" style="margin-top: 2rem;height: 600px;">
+        <table style="position:relative;">
             <tr>
                 <th>Icon</th>
-            <th>Name</th>
-            <!-- <th>Open</th> -->
-            <th>Download</th>
-            <th>Delete</th>
+                <th>Name</th>
+                <!-- <th>Open</th> -->
+                <th>Download</th>
+                <th>Delete</th>
             </tr>
-            <aura:iteration items="{!v.files}" var="file"> 
-                <tr>
-                    <td>
+                <aura:iteration items="{!v.files}" var="file"> 
+                    <tr>
+                        <td>
+                            <aura:if isTrue="{!file.mimiType=='folder'}" >
+                                <lightning:icon iconName="utility:open_folder" alternativeText="Approved" title="Approved" />
+                            </aura:if>
+                            <aura:if isTrue="{!file.mimiType=='file'}" >
+                                <!-- <lightning:icon iconName="doctype:audio" alternativeText="Audio file" title="Audio" /> -->
+                                <lightning:icon iconName="doctype:attachment" alternativeText="Approved" title="Approved" />
+                            </aura:if>
+                            <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.spreadsheet'}" >
+                                <lightning:icon iconName="doctype:excel" alternativeText="Approved" title="Approved" />
+                            </aura:if>
+                            <aura:if isTrue="{!file.mimiType=='image/jpeg'}" >
+                                <lightning:icon iconName="utility:image" alternativeText="Approved" title="Approved" />
+                            </aura:if>
+                            <aura:if isTrue="{!file.mimiType=='video/mp4'}">
+                                <lightning:icon iconName="doctype:mp4" alternativeText="Approved" title="Approved" />
+                            </aura:if>
+                        </td>
                         <aura:if isTrue="{!file.mimiType=='folder'}" >
-                            <lightning:icon iconName="utility:open_folder" alternativeText="Approved" title="Approved" />
+                            <td data-tit = "{!file.Id}" data-name="{!file.name}" onclick="{!c.openFolderFiles}">
+                                    <a style="cursor: pointer;text-decoration:none;" id="{!file.Id}" >{!file.name}</a>
+                                
+                            </td>
                         </aura:if>
-                        <aura:if isTrue="{!file.mimiType=='file'}" >
-                            <!-- <lightning:icon iconName="doctype:audio" alternativeText="Audio file" title="Audio" /> -->
-                            <lightning:icon iconName="doctype:attachment" alternativeText="Approved" title="Approved" />
+                        <aura:if isTrue="{!file.mimiType!='folder'}" >
+                            <td >
+                                <!-- "{!'/' + v.record.Id} -->
+                            
+                                    <a href="{!file.alternativeLink}" target="_blank" style="cursor: pointer; text-decoration:none;" id="{!file.Id}" >{!file.name}</a>
+                                
+                            </td>
                         </aura:if>
-                        <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.spreadsheet'}" >
-                            <lightning:icon iconName="doctype:excel" alternativeText="Approved" title="Approved" />
-                        </aura:if>
-                        <aura:if isTrue="{!file.mimiType=='image/jpeg'}" >
-                            <lightning:icon iconName="utility:image" alternativeText="Approved" title="Approved" />
-                        </aura:if>
-                        <aura:if isTrue="{!file.mimiType=='video/mp4'}">
-                            <lightning:icon iconName="doctype:mp4" alternativeText="Approved" title="Approved" />
-                        </aura:if>
-                        
-                        <!-- <img src="{!file.iconLink}" alt="hello"/> -->
-                        <!-- <lightning:avatar src="{!file.iconLink}" alternativeText="John Smith"/> -->
-                    </td>
-        <td >
-            <!-- "{!'/' + v.record.Id} -->
-                <a href="{!file.alternativeLink}" style="cursor: pointer;" id="{!file.Id}" >{!file.name}</a>
-        </td>
-        <!-- <td>Open</td> -->
-        
-        <aura:if isTrue="{!file.mimiType!='folder'}" >
-        <td data-tit = "{!file.Id}" onclick="{!c.downLoadFile}">
-            <!-- <a href="{!file.downLoadLink}"> -->
-                    <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   />
-                <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
-            <!-- </a> -->
-        </td>
-    </aura:if>
-    <aura:if isTrue="{!file.mimiType=='folder'}">
-        <td>
-            not download
-            <!-- <a href="{!file.downLoadLink}"> -->
-                    <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
-                <!-- <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   /> -->
-            <!-- </a> -->
-        </td>
-    </aura:if>
-        <td data-del = "{!file.Id}" onclick="{!c.deleteFile}" data-type = "{!file.mimiType}">      
-            <lightning:icon iconName="action:delete" size="small" alternativeText="Approved" title="Approved" style="cursor: pointer;"/>
-        </td>
-        </tr>
-        <!-- <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.folder'}" >
-            folder
-        </aura:if> -->
-        </aura:iteration>
-        
+            <aura:if isTrue="{!file.mimiType!='folder'}" >
+            <td data-tit = "{!file.Id}" onclick="{!c.downLoadFile}">
+                        <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved" style="cursor: pointer;"   />
+            </td>
+        </aura:if>
+        <aura:if isTrue="{!file.mimiType=='folder'}">
+            <td>
+                <lightning:icon iconName="action:download" size="small"  alternativeText="Approved" title="Approved"   style="background-color: gainsboro;" />
+            </td>
+        </aura:if>
+            <td data-del = "{!file.Id}" onclick="{!c.deleteFile}" data-type = "{!file.mimiType}">      
+                <lightning:icon iconName="action:delete" size="small" alternativeText="Approved" title="Approved" style="cursor: pointer;"/>
+            </td>
+            </tr>
+            <!-- <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.folder'}" >
+                folder
+            </aura:if> -->
+            </aura:iteration>
+            
         </table>
     </div>
     <div style="display: flex; flex-direction: row;">
         <lightning:button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick="{!c.createNewFolder}" ></lightning:button>
         <lightning:fileUpload label="Attach receipt"
         name="fileUploader"
-        multiple="true"
+        multiple="false"
         accept="{!v.filetype}"
         recordId="{!v.recordId}"
         onuploadfinished="{!c.handleUploadFinished}" style="margin-left: 1rem "/>
     </div>
-    <!-- <lightning:card  variant="Narrow"  title="Box API For Create Folder" >
-        <div class="slds-var-p-around_small">
-            <lightning:layout >
-                <lightning:layoutItem  >
-                    <lightning:input name="newFolderName" class="fieldvalidate" type="text"
-                                     label="Folder Name" >
-                    </lightning:input><br/>
-                </lightning:layoutItem>
- 
-                <lightning:layoutItem size="12" class="slds-var-p-top_small">
-                    <lightning:button class="slds-align_absolute-center" variant="brand" label="Create Folder"
-                        onclick="{!c.handleCreateFolder}"> 
-                    </lightning:button>
-                </lightning:layoutItem>
-            </lightning:layout>
-        </div>
-    </lightning:card><br/> -->
-     
-     <!-- Upload files card -->
-     <!-- <lightning:card  variant="Narrow"  title="Box API For Upload Files" >
-        <div class="slds-var-p-around_small">
-            <lightning:layout >
-                <lightning:layoutItem>
-                    <lightning:input name="folderName" class="fieldvalidateFile" type="tel"
-                                     label="Folder Id" onchange="{!c.handleFolderName}">
-                    </lightning:input><br/>
-                    <lightning:input label="File" name="file uploader"
-                                     onchange="{!c.handleFilesChange}" type="file">
-                    </lightning:input>
-                </lightning:layoutItem>
- 
-                <lightning:layoutItem size="12" class="slds-var-p-top_small">
-                    <lightning:button class="slds-align_absolute-center" variant="brand" label="Upload Files"
-                        onclick="{!c.uploadFileToBox}">
-                    </lightning:button>
-                </lightning:layoutItem>
-            </lightning:layout>
-        </div>
-    </lightning:card> -->
-    <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
-    <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
-
-<!-- <lightning:fileUpload label="Attach receipt"
-    name="fileUploader"
-    multiple="true"
-    accept="{!v.filetype}"
-    recordId="{!v.recordId}"
-    onuploadfinished="{!c.handleUploadFinished}" /> -->
+   
 </aura:component>

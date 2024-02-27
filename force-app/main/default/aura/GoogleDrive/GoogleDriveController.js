@@ -1,4 +1,10 @@
 ({
+     /** 
+     Name: doInit,
+     Param:component, event, helper
+     Return Type:null
+     description: when component render this method initialize and check if user is already present call files else called authurl
+    **/
     doInit : function(component, event, helper) {
        	var url = window.location.href;
         function getParameterByName(name, url) {
@@ -6,154 +12,97 @@
             name = name.replace(/[\[\]]/g, '\\$&');
             var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
                 results = regex.exec(url);
-                // console.log('===reges==',reges);
-
-            console.log('===results==',results);
             if (!results) return null;
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
         var code = getParameterByName('code');
-        var action  = component.get("c.createAuthURL");
-        var accessToken; 
-        action.setCallback(this, function(response){
-            var status = response.getState();
-            if(status === "SUCCESS"){
-                var authUrl = response.getReturnValue();
-                console.log(authUrl);
-                console.log(code);
             if(code !== undefined && code!==null) {
                   console.log('code');
                     helper.getAccessToken(component,code,helper);
                 }
-                if(code==null){
-                    console.log('hellow hima2');
-                    helper.getdoAuth(component,event,helper);
-                    // accessToken=component.get('v.accessToken');
-                    // window.location.href = response.getReturnValue();
+            else{
+                    var action  = component.get("c.checkUserCreatedOrNot");
+                    action.setCallback(this, function(response){
+                        var status = response.getState();
+                        if(status === "SUCCESS"){
+                            var authUrl = response.getReturnValue();
+                            console.log(authUrl);
+                            console.log(code);
+                            if(authUrl==true){
+                                helper.getFiles(component,event,helper);
+                            }
+                            else{
+                                console.log('hello world');
+                                helper.getdoAuth(component,event,helper);
+                            }
+                        }
+                    });
+                    $A.enqueueAction(action);
                 }
-                // if(accessToken!=null){
-                //     console.log(accessToken,'-------->');
-                //     console.log('hello hima');
-                //     helper.getFiles(component,event,helper);
-                // }
-            }
-        });
-        $A.enqueueAction(action);
-        // var code = getParameterByName('code');
-        // console.log(code,'code');
-        // if(code !== undefined && code!==null) {
-        //     var action = component.get('c.getAccessToken');
-        //     action.setParams({
-        //         'code' : code
-        //     });
-        //     action.setCallback(this, function(response){
-        //         var status = response.getState();
-        //         console.log(status,'status');
-        //         // console.log(code,'code');
-        //        	if(status === "SUCCESS"){
-        //             console.log(code,'code23');
-        //             var accessToken = response.getReturnValue();
-        //             console.log(accessToken);
-        //             component.set("v.accessToken", accessToken);
-        //             component.set("v.access", accessToken==true?'Authenticated..':'Not Authenticated..');
-        //         }
-        //     });
-            
-        //     $A.enqueueAction(action);
-        // }
-    },
-    // getLink:function(component,event,helper){
-
-    // },
-    doAuth : function(component, event, helper) {
-        helper.getdoAuth(component,event,helper);
-        // var temp=component.get('v.disabled');
-        // console.log(temp,'---->');
-        // if(temp==false){
-            // helper.getFiles(component,event,helper);
-        // }
-        // var action  = component.get("c.createAuthURL");
-        // action.setCallback(this, function(response){
-        //     var status = response.getState();
-        //     if(status === "SUCCESS"){
-        //         var authUrl = response.getReturnValue();
-        //         window.location.href = response.getReturnValue();
-        //     }
-        // });
+                var breadcrumbCollection = [
+                    {label: 'Home', id: 'root' }
+                ];
         
-        // $A.enqueueAction(action);
+                component.set('v.breadcrumbCollection', breadcrumbCollection);
+                component.set('v.loaded', true);
     },
-    // handleCreateFolder:function(component, event, helper){
-    //     const inputValidation = [...this.template.querySelectorAll('.fieldvalidate')]
-    //         .reduce((validSoFar, inputField) => {
-    //             inputField.reportValidity();
-    //             return validSoFar && inputField.checkValidity();
-    //         }, true);
-    //     if (inputValidation) {
-    //      //perform success logic
-    //       let inputFields = this.template.querySelectorAll('.fieldvalidate');
-    //       inputFields.forEach(inputField => {
-    //         if(inputField.name == "newFolderName"){
-    //             this.newFolderName = inputField.value;
-    //         }
-    //        });
-    //        this.handleApexCallCreateFolder();
-    //     }
-    // },
-    filesget : function(component, event, helper) {
-        helper.getFiles(component,event,helper);
-    },
+     /** 
+     Name: deleteFile,
+     Param:component, event, helper
+     Return Type:null
+     description: method called when delete button is clicked
+    **/
     deleteFile : function(component, event, helper) {
-        console.log('hello');
-        // component.set('v.fileId','');
         var selectedItem = event.currentTarget;
-        console.log('hello1',selectedItem);
         var selectedField = selectedItem.dataset.tit;
-        console.log('hello2',selectedField);
         component.set('v.fileId',selectedField);
-        console.log(component.get('v.fileId'));
-        console.log(selectedField,'---selec');
         helper.getDeleteFile(component,event,helper);
         helper.getFiles(component,event,helper);
     },
-    
+    /** 
+     Name: handleUploadFinished,
+     Param:component, event, helper
+     Return Type:null
+     description:if file is upload this method called
+    **/
     handleUploadFinished: function(component, event, helper) {
-            // var recordId=component.get('v.recordId');
-            // console.log(recordId);
-            // var filetype=component.get('v.filetype');
-            // console.log(filetype);
-            var uploadedFiles = event.getParam("files");
-            console.log(uploadedFiles);
-            var attachmentId = uploadedFiles[0].documentId;
-            var code = component.get("v.accessToken");
-            
-            var action  = component.get("c.uploadFile");
-            action.setParams({
-                "name":uploadedFiles[0].name,
-                "attachmentId": attachmentId,
-                "accessToken" : code,
-                "type":uploadedFiles[0].mimeType
-            });
-            action.setCallback(this, function(response){
-                var status = response.getState();
-                if(status === "SUCCESS"){
-                    var responseCode = response.getReturnValue();
-                    if(responseCode == '200'){
-                        alert('File Uploaded successfully');
-                        helper.getFiles(component,event,helper);
+        console.log(component.get('v.breadCrumbFileId'));
+        var uploadedFiles = event.getParam("files");
+        var attachmentId = uploadedFiles[0].documentId;
+        var lastIndex= uploadedFiles[0].name.lastIndexOf('.');
+        var name=uploadedFiles[0].name.substring(0,lastIndex);
+        var action  = component.get("c.uploadFile");
+        console.log('hello1');
+        action.setParams({
+            "name":name,
+            "attachmentId": attachmentId,
+            "parentId" :  component.get('v.breadCrumbFileId'),
+            "type":uploadedFiles[0].mimeType
+        });
+        console.log('hello2');
 
-                    }
-                    
-                    else
-                        alert('There was some error');
-                }
-            });
-            
-            $A.enqueueAction(action);
-
+        action.setCallback(this, function(response){
+            var status = response.getState();
+            if(status === "SUCCESS"){
+                var responseCode = response.getReturnValue();
+                if(responseCode == '200'){
+                    alert('File Uploaded successfully');
+                    helper.getFiles(component,event,helper);
+                }     
+                else
+                    alert('There was some error');
+            }
+        });
+        $A.enqueueAction(action);
     },
-   handleFilesChange: function(component, event, helper) {
+    /** 
+     Name: handleFilesChange,
+     Param:component, event, helper
+     Return Type:null
+     description:if file is upload this method called
+    **/
+    handleFilesChange: function(component, event, helper) {
        var fileInput = event.getSource().get('v.files');
         var file = fileInput[0];
         if (file) {
@@ -181,78 +130,74 @@
                 $A.enqueueAction(action);
             };
             reader.readAsDataURL(file);
-        
         }
-       // handleFilesChange: function(component, event, helper) {
-       /* var fileInput = event.getSource().get('v.files');
-        var file = fileInput[0];
-        if (file) {
-            var action = component.get("c.uploadFile");
+    },
+    /** 
+     Name: createNewFolder,
+     Param:component, event, helper
+     Return Type:null
+     description:this method call when new folder is created
+    **/
+    createNewFolder:function(component, event, helper) {
+        var prompt=window.prompt('Please enter Folder name');
+        if(prompt!=null){
+            var action  = component.get("c.newFolder");
             action.setParams({
-                "fileName": file.name,
-                "accessToken": component.get('v.accessToken'),
-                "fileContent": file
+                "folderName": prompt,
+                "fileId":component.get('v.breadCrumbFileId')
             });
             action.setCallback(this, function(response) {
                 var status = response.getState();
-                if (status === "SUCCESS") {
-                    console.log('File uploaded successfully');
-                    // Handle success if needed
-                } else {
-                    console.error('Error uploading file: ' + response.getError()[0].message);
-                    // Handle error if needed
+                if(status === "SUCCESS"){
+                    var responseCode = response.getReturnValue();
+                    if(responseCode == true){
+                        alert('Folder Created Successfully');
+                        helper.getFiles(component,event,helper);
+                    }
+                    else
+                        alert('There was some error');
                 }
             });
-            $A.enqueueAction(action);
-        }*/
-        // var fileName = 'No File Selected..';
-        // if (event.getSource().get("v.files").length > 0) {
-        //     fileName = event.getSource().get("v.files")[0]['name'];
-        // }
-        // component.set("v.fileName", fileName);
-    },
-    createNewFolder:function(component, event, helper) {
-        var prompt=window.prompt('Please enter Folder name');
-        console.log(prompt);
-        if(prompt!=null){
-        var action  = component.get("c.newFolder");
-        action.setParams({
-            "folderName": prompt
-        });
-        action.setCallback(this, function(response){
-            var status = response.getState();
-            if(status === "SUCCESS"){
-                var responseCode = response.getReturnValue();
-                if(responseCode == true){
-                    alert('Folder Created Successfully');
-                    helper.getFiles(component,event,helper);
-
-                }
-                else
-                    alert('There was some error');
-            }
-        });
-    }
+        }
         $A.enqueueAction(action);
+    },
+    /** 
+     Name: openFolderFiles,
+     Param:component, event, helper
+     Return Type:null
+     description:this method for breadcrumb when folder will clicked according to that file will come
+    **/
+    openFolderFiles:function(component, event, helper) {
+        var selectedItem = event.currentTarget;
+        var selectedField = selectedItem.dataset.tit;
+        var selectedFieldName=selectedItem.dataset.name;
+        component.set('v.breadCrumbFileId',selectedField);
+        helper.getFiles(component,event,helper);
+        var breadCrumbLists=component.get('v.breadcrumbCollection');
+        breadCrumbLists.push({label:selectedFieldName, id:selectedField});
+        component.set('v.breadcrumbCollection', breadCrumbLists);
+    },
+
+    /** 
+     Name: navigateTo,
+     Param:component, event, helper
+     Return Type:null
+     description:this method for breadcrumb when breadcrumb file will clicked
+    **/
+    navigateTo: function (component, event, helper) {
+        component.set('v.loaded', false);
+        var folderIdToNavigate = event.getSource().get('v.id');
+        var labelName = event.getSource().get('v.label');
+        component.set('v.breadCrumbFileId',folderIdToNavigate);
+        var breadCrumbLists=component.get('v.breadcrumbCollection');
+        for(var i=0;i<breadCrumbLists.length;i++ ){
+            if(breadCrumbLists[i].label==labelName&&i<breadCrumbLists.length){
+                breadCrumbLists.splice(i+1,breadCrumbLists.length-(i+1));
+                break;
+            }
+        }
+        helper.getFiles(component,event,helper);
+        component.set('v.breadcrumbCollection', breadCrumbLists);
+        component.set('v.loaded', true);
     }
-    // getAccessToken:function(component,event,helper) {
-    //     console.log('code');
-    //     var code = getParameterByName('code');
-    //     console.log(code,'code');
-    //     if(code !== undefined && code!=='' && code!==null) {
-    //         var action = component.get('c.getAccessToken');
-    //         action.setParams({
-    //             'code' : code
-    //         });
-    //         action.setCallback(this, function(response){
-    //             var status = response.getState();
-    //            	if(status === "SUCCESS"){
-    //                 var accessToken = response.getReturnValue();
-    //                 component.set("v.accessToken", accessToken);
-    //                 component.set("v.access", accessToken==true?'Authenticated..':'Not Authenticated..');
-    //             }
-    //         });
-            
-    //     }   $A.enqueueAction(action);
-    // }
 })
