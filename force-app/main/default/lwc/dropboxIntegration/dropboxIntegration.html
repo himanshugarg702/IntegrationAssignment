@@ -1,7 +1,5 @@
 <template>
-    <!-- <div style="background:white;height:500px">
-        Welcome to my website {websiteName}
-    </div> -->
+    
        <!-- loader -->
        <lightning-breadcrumbs>
         <template for:each={myBreadcrumbs} for:item="crumbs">
@@ -18,6 +16,7 @@
             alternative-text="Loading..." variant="brand" class="slds-is-fixed">
         </lightning-spinner>
     </div>
+    <!-- Showing file data -->
     <div class="slds-scrollable_y" style="margin-top: 2rem;height: 450px;">
         <table  style="position:relative;">
             <tr style="font-size: 1rem;  font-weight: bold;">
@@ -28,112 +27,63 @@
             </tr>
             <template if:true={listOfFolderFile}>
                 <template for:each={listOfFolderFile} for:item="file">
-                    <!-- <tr style="border-bottom: 1px solid blue"> -->
-                        <!-- <p key={file.Id}>{file.name}</p> -->
                         <tr key={file.id}>
                             <td>
                                 <template lwc:if={file.folderOrFile}>
                                     <lightning-icon icon-name="utility:image" alternative-text="Approved" title="Approved"></lightning-icon>
-                                  
-                                    <!-- <lightning:icon iconName="utility:open_folder" alternativeText="Approved" title="Approved" /> -->
-                               </template>
+                                </template>
                                <template lwc:else>
-                                <lightning-icon icon-name="utility:open_folder" alternative-text="Approved" title="Approved"></lightning-icon>
+                                    <lightning-icon icon-name="utility:open_folder" alternative-text="Approved" title="Approved"></lightning-icon>
                                 </template>
                             </td>
                             <template lwc:if={file.folderOrFile}>
-                            <td  data-foldername={file.name} >
-                                <a style="cursor: pointer;text-decoration:none;" >{file.name}</a> 
-                            </td>
+                                <td  data-pathpreview={file.pathDisplay} onclick={previewFile}>
+                                    <a style="cursor: pointer;text-decoration:none;" >{file.name}</a> 
+                                </td>
                             </template>
                             <template lwc:else>
                                 <td  data-foldername={file.name}  onclick={navigateFolder}>
                                     <a style="cursor: pointer;text-decoration:none;" >{file.name}</a> 
                                 </td>
-                                </template>
+                            </template>
                             <td>
                                 <template lwc:if={file.folderOrFile}>
-                                    <lightning-icon icon-name="action:download" alternative-text="Approved" title="Approved" style="cursor: pointer;" ></lightning-icon>      
+                                    <lightning-icon  data-pathdownload={file.pathDisplay} icon-name="action:download" alternative-text="Approved" title="Approved" style="cursor: pointer;" onclick={downloadFiles}></lightning-icon>      
                                </template>
                                <template lwc:else>
-                                <lightning-icon icon-name="action:download" alternative-text="Approved" title="Approved" style="background-color: gainsboro;"></lightning-icon>
-                                </template>
-                                                     
+                                    <lightning-icon icon-name="action:download" alternative-text="Approved" title="Approved" style="background-color: gainsboro;"></lightning-icon>
+                                </template>               
                             </td>
-                            <td><lightning-icon icon-name="action:delete" alternative-text="Approved" title="Approved" style="cursor: pointer;" ></lightning-icon>  </td>
+                            <td>
+                                <lightning-icon data-pathdelete={file.pathDisplay} icon-name="action:delete" alternative-text="Approved" title="Approved" style="cursor: pointer;" onclick={deleteFiles}></lightning-icon>  </td>
                         </tr>
-                  
                 </template>
-
             </template>
         </table>
     </div>
-    <!------------->
-    <div class="slds-tabs_card">
-        <div class="slds-page-header">
-            <div class="slds-page-header__row">
-                <div class="slds-page-header__col-title">
-                    <div class="slds-media">
-                        <div class="slds-media__figure">
-                            <span class="slds-icon_container slds-icon-standard-opportunity">
-                                 <lightning-icon icon-name="standard:recipe" alternative-text="recipe" title="recipe"></lightning-icon>
-                            </span>
-                        </div>
-                        <div class="slds-media__body">
-                            <div class="slds-page-header__name">
-                                <div class="slds-page-header__name-title">
-                                    <h1>
-                                        <span>Box API Call From Apex</span>
-                                        <span class="slds-page-header__title slds-truncate" title="Recently Viewed">TechDicer</span>
-                                    </h1>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <br/>
+    
     <!-- create folder card -->
-    <lightning-button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick={handleApexCallCreateFolder}></lightning-button>
-
-    <!-- <lightning-card  variant="Narrow"  title="Box API For Create Folder" icon-name="standard:folder">
-        <div class="slds-var-p-around_small">
-            <lightning-layout multiple-rows>
-                <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
-                    <lightning-input name="newFolderName" class="fieldvalidate" type="text"
-                                     label="Folder Name" required>
-                    </lightning-input>
-                </lightning-layout-item>
- 
-                <lightning-layout-item size="12" class="slds-var-p-top_small">
-                    <lightning-button class="slds-align_absolute-center" variant="brand" label="Create Folder"
-                        onclick={handleCreateFolder}>
-                    </lightning-button>
-                </lightning-layout-item>
-            </lightning-layout>
-        </div>
-    </lightning-card><br/> -->
- 
-    <!-- Upload files card -->
-    <!-- <lightning-card  variant="Narrow"  title="Box API For Upload Files" icon-name="standard:file">
-        <div class="slds-var-p-around_small">
-            <lightning-layout multiple-rows>
-                <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
-                    <lightning-input name="folderName" class="fieldvalidateFile" type="tel"
-                                     label="Folder Id" onchange={handleFolderName}>
-                    </lightning-input><br/>
-                    <lightning-input label="File" name="file uploader"
-                                     onchange={handleFilesChange} type="file">
-                    </lightning-input>
-                </lightning-layout-item>
- 
-                <lightning-layout-item size="12" class="slds-var-p-top_small">
-                    <lightning-button class="slds-align_absolute-center" variant="brand" label="Upload Files"
-                        onclick={uploadFileToBox}>
-                    </lightning-button>
-                </lightning-layout-item>
-            </lightning-layout>
-        </div>
-    </lightning-card> -->
+    <div style="display: flex; flex-direction: row;">
+        <lightning-button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick={handleApexCallCreateFolder} style="margin-top: 1.4rem;;" ></lightning-button>
+        <!-- <lightning-card  variant="Narrow"  title="Box API For Upload Files" icon-name="standard:file">
+            <div class="slds-var-p-around_small">
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12"> -->
+                        <lightning-input name="file uploader"
+                                        onchange={handleUploadFinished} type="file"  >
+                        </lightning-input>
+                    <!-- </lightning-layout-item>
+                </lightning-layout>
+            </div>
+        </lightning-card> -->
+    <!-- <lightning-file-upload
+        label="Attach receipt"
+        name="fileUploader"
+        accept={acceptedFormats}
+        record-id={myRecordId}
+        onuploadfinished={handleUploadFinished}
+        style="margin-left: 1rem;"
+    >
+    </lightning-file-upload> -->
+    </div>
 </template>

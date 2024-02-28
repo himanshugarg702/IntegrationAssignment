@@ -1,5 +1,13 @@
 @isTest
 public class MockTestClass  implements HttpCalloutMock{
+    public static void insertFileAsContent(){
+        ContentVersion cv=new ContentVersion(
+            Title='testing',
+            PathOnClient='TextFile.txt',
+            VersionData=Blob.valueOf('T')
+        );
+        insert cv;
+    }
     public HTTPResponse respond(HTTPRequest req) {
         HTTPResponse res=new HTTPResponse();
         if(req.getEndpoint()=='https://accounts.google.com/o/oauth2/token'&&req.getMethod()=='POST'){
@@ -32,17 +40,6 @@ public class MockTestClass  implements HttpCalloutMock{
             res.setBody('{"title":"hello","mimeType": "image/jpeg"}');
             res.setStatusCode(200);
         }
-        // System.assertEquals('https://accounts.google.com/o/oauth2/token', req.getEndpoint());
-        // System.assertEquals('GET', req.getMethod());        
-        // Create a fake response
-        // HttpResponse res = new HttpResponse();
-       
-        
-        // res.setStatusCode(200);
-        // String messageBody ='code='+code+'&client_id='+key+
-        // '&client_secret='+secert+
-        // '&redirect_uri='+redirect_uri+
-        // '&grant_type=authorization_code';
         return res;
     }
 }

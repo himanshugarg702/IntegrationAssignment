@@ -9,7 +9,7 @@
         //API Secret
         private static string secert =Drives__mdt.getInstance('dropbox').AppSecret__c;
         private static string redirect_uri = 'https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=43259';
-        private static string authUrl='https://www.dropbox.com/oauth2/authorize';//https://api.dropboxapi.com/2/users/get_current_account
+        private static string authUrl='https://www.dropbox.com/oauth2/authorize';
         private static string scope='files.metadata.read file_requests.read files.content.read files.content.write file_requests.write';//'file_requests.read';//'files.metadata.read';
         private static string tokenUrl='https://www.dropbox.com/oauth2/token';
         /** 
@@ -36,7 +36,6 @@
         **/
         @AuraEnabled
         public static String createAuthURL() {
-            System.debug(key);
             String key = EncodingUtil.urlEncode(key,'UTF-8');
             String uri = EncodingUtil.urlEncode(redirect_uri,'UTF-8');
             String authuri = '';
@@ -58,30 +57,22 @@
         
         @AuraEnabled
         public static Boolean newFolder(String folderName){
-            System.debug(folderName);
             Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
            Boolean isError = false;
             String endPoint = 'https://api.dropboxapi.com/2/files/create_folder_v2';
-            String body = '{"path": "/'+folderName+'","autorename": false}';
-            Http http = new Http();
-            HttpRequest req = new HttpRequest();
-            HttpResponse res = new HttpResponse();
-            req.setEndpoint(endpoint);
-            req.setHeader('Authorization', 'Bearer '+integration.Access_Token__c);
-            req.setHeader('Content-Type', 'application/json');
-            req.setMethod('POST');
-            req.setBody(body);
-            res = http.send(req);
-            System.debug(res);
+            String body = '{"path": "'+folderName+'","autorename": false}';
+            Map<String,String> headers=new Map<String,String>();
+            headers.put('content-type','application/Json');
+            headers.put('Authorization','Bearer '+integration.Access_Token__c);
+            String method='POST';
+            HttpResponse response = ServiceClass.requestDropBox(endPoint,method,headers,body);
             Map<string, string> jsonDataMap = new Map<string, string>();
-            jsonDataMap = parseJSONToMap(res.getBody());
+            jsonDataMap = parseJSONToMap(response.getBody());
             if(jsonDataMap.containsKey('error')){
                 isError = true;
                 return isError;
-                // errorMessage = 'Create Folder Process failed!!';
             }
             else {
-                // successMessage = 'Folder Created Successfully!!';
                 return isError;
             }
         }
@@ -100,27 +91,6 @@
             }
             return jsonMap;
         }
-        // public static Boolean newFolder(String folderName,String fileId) {
-        //     String parentFolderId=fileId;
-        //     Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
-        //     String accessToken=integration.Access_Token__c;
-        //     HttpRequest req = new HttpRequest();
-        //     req.setMethod('POST');     
-        //     req.setEndpoint('https://api.box.com/2.0/folders');
-        //     req.setHeader('Authorization', 'Bearer '+accessToken);
-        //     req.setHeader('content-type', 'application/json');
-        //     String body = '{ "name": "' + folderName + '", "parent": { "id": "' + parentFolderId + '" } }';
-        //     req.setTimeout(60*1000);
-        //     req.setBody(body);
-        //     Http http = new Http();
-        //     HttpResponse res = http.send(req);
-        //     if(res.getStatusCode()==201){
-        //         return true;
-        //     }
-        //     else{
-        //         return false;
-        //     }
-        // }
          /** 
          Name: retrieveGoogleAccessToken,
         description:retrieving again access token with the help of refrtesh token this method only for apex,
@@ -128,23 +98,17 @@
         Return Type:Integration__c object
         **/
         public static Integration__c  retrieveDropBoxAccessToken(Integration__c userData){
-            Http h = new Http();
-            HttpRequest req = new HttpRequest();
-            req.setEndpoint(tokenUrl);
             string bodyRequest = '';
             bodyRequest = 'client_id=' + EncodingUtil.urlEncode(key, 'UTF-8');
             bodyRequest += '&client_secret=' + EncodingUtil.urlEncode(secert, 'UTF-8');
             bodyRequest += '&refresh_token=' + userData.Refresh_Token__c;
             bodyRequest += '&grant_type=refresh_token';
-            req.setBody(bodyRequest);         
-            req.setHeader('Content-length', string.ValueOf(bodyRequest.length())); 
-            // req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-            req.setMethod('POST');
-            System.debug('hello world hima garg');
-            req.setTimeout(10000);
-            HttpResponse res = h.send(req);   
+            Map<String,String> headers=new Map<String,String>();
+            headers.put('content-length',string.ValueOf(bodyRequest.length()));
+            String method='POST';
+            HttpResponse response = ServiceClass.requestDropBox(tokenUrl,method,headers,bodyRequest);
             String responseText;
-            responseText = res.getBody();
+            responseText = response.getBody();
             Map<String,object> responseMap =(Map<String,object>)JSON.deserializeUntyped(responseText) ;  
             userData.Access_Token__c=(String)responseMap.get('access_token');
             userData.ExpiresIn__c=DateTime.valueOf(System.now().addSeconds((Integer)responseMap.get('expires_in')));
@@ -157,7 +121,12 @@
         Return Type:WrapperGoogleDrice class
         **/
         @AuraEnabled
-        public static List<WrapperBox> getAllFilesFromBox(String rootFolderId) {   
+        public static Object getAllFilesFromBox(String rootFolderId) {   
+            if(rootFolderId.length()>1){
+                if(rootFolderId.substring(0,1)!='/'){
+                    rootFolderId='/'+rootFolderId;
+                }
+            }
             Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
             if(rootFolderId=='/'){
                 rootFolderId='';
@@ -173,10 +142,8 @@
             headers.put('Authorization','Bearer '+integration.Access_Token__c);
             String body='{"include_deleted":false,"include_has_explicit_shared_members":false,"include_media_info":false,"include_mounted_folders":true,"include_non_downloadable_files":true,"path":"'+rootFolderId+'","recursive":false}';
             HttpResponse response = ServiceClass.requestDropBox(endPoint,method,headers,body);
-            System.debug(response);
             if(response.getStatusCode()==200){
                 Map<String,Object> jsonResponse=(Map<String,Object>) JSON.deserializeUntyped(response.getBody());
-                System.debug(jsonResponse);
                 List<Object> files=(List<Object>) jsonResponse.get('entries');
                 for(Object file:files){
                     Map<String,Object> fileInfo=(Map<String,Object>) file;
@@ -190,10 +157,11 @@
                         else{
                             googleDriveItem.folderOrFile=false;
                         }
+                        googleDriveItem.pathDisplay=(String)fileInfo.get('path_display');
                         fileList.add(googleDriveItem);
                 }
                 String responseBody=response.getBody();
-            }
+            }     
             else{
                 System.debug('Error: '+ response.getStatusCode()+' '+response.getStatus());
             }
@@ -218,98 +186,66 @@
                 '&redirect_uri='+redirect_uri+
                 '&grant_type=authorization_code';
                 headers.put('Content-length', String.valueOf(messageBody.length()));
-            System.debug('messageBody:'+messageBody);
             String responseText;
             HttpResponse response = ServiceClass.requestDropBox(endPoint,method,headers,messageBody);
             responseText = response.getBody();
+            System.debug(responseText);
             system.debug('responseText:'+responseText);
             Map<String,object> responseMap =(Map<String,object>)JSON.deserializeUntyped(responseText);  
-            String token =  String.valueOf(responseMap.get('access_token'));
             MetadataService.dropboxApiData(responseMap);
-            return token;
-        }
-         /** 
-         Name: newMessageException,
-        description: for throwing exception if error occured,
-        Param: message ,
-        Return Type:AuraHandledException
-        **/
-        private static AuraHandledException newMessageException(String message) {
-            AuraHandledException e = new AuraHandledException(message);
-            e.setMessage(message);
-            return e;
+            return null;
         }
 
           /** 
          Name: uploadFile,
-        description:upload file from component in box ,
+        description:upload file from component in box,
         Param:StringID,
         Return Type:String
         **/
         @AuraEnabled
-        public static String uploadFile(String base64, String filename, String folderId){
-            folderId='0';
-            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
-            String accessToken=integration.Access_Token__c;
-            if(base64!=null){
-                blob base64EncodeFile = base64EncodeFileContent(EncodingUtil.base64Decode(base64),filename);
-                String uploadEndPointURL='https://upload.box.com/api/2.0/files/content?parent_id='+folderId;
-                String boundary = '----------------------------741e90d31eff';
-                String body = '{"name":"' + filename + '", "parent":{"id":"' + folderId + '"}}';
+        public static String uploadToDropBox(String file, String filename,String path) {
+            Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
+                String boundary = '----------9889464542212';
+                // String bodyEncoded = EncodingUtil.base64Encode(file);
+                Blob bodyEncoded2 = EncodingUtil.base64Decode(file);
+                String body = '{ "path": "'+path+'/'+filename+'", "mode": "add", "autorename": true, "mute": false, "strict_conflict": false }';
+                Http http = new Http();
                 HttpRequest req = new HttpRequest();
+                String endpoint = 'https://content.dropboxapi.com/2/files/upload';
+                String method='POST';
+                Map<String,String> headers=new Map<String,String>();
+                headers.put('Authorization', 'Bearer '+integration.Access_Token__c);
+                headers.put('Dropbox-API-Arg', body);
+                headers.put('Content-Type', 'application/octet-stream');
+                headers.put('Content-length', String.valueOf(file.length()));
+                req.setEndpoint(endpoint);
+                req.setHeader('Authorization', 'Bearer '+integration.Access_Token__c);
+                req.setHeader('Dropbox-API-Arg', body);
+                req.setHeader('Content-Type', 'application/octet-stream');
+                req.setHeader('Content-length', String.valueOf(file.length()));
                 req.setBody(body);
-                req.setBodyAsBlob(base64EncodeFile);
-                req.setHeader('Content-Type','multipart/form-data; boundary='+boundary);
-                req.setHeader('Authorization', 'Bearer ' + accessToken);
+                req.setBodyAsBlob(bodyEncoded2);
                 req.setMethod('POST');
-                req.setEndpoint(uploadEndPointURL);
-                req.setTimeout(120000);
-                Http ht = new Http();
-                HTTPResponse res = ht.send(req);
-                System.debug('**Files upload Response: ' + res.getBody());
-                Integer uploadStatusCode=res.getStatusCode();
-                if(uploadStatusCode==201){
-                    return 'File uploaded successfully.';
-                }else{
-                throw newMessageException('Error encountered. Status Code: ' + uploadStatusCode);                
-                }
-            }else{
-                throw newMessageException('Please select file.');
-            }
+                req.setTimeout(60*1000);
+                HttpResponse resp = http.send(req);
+                map<string, string> jsonDataMap = new map<string, string>();
+                jsonDataMap = parseJSONToMap1(resp.getBody());
+                return null;
         }
-
-        public static blob base64EncodeFileContent(Blob file_body, String file_name){
-            String boundary = '----------------------------741e90d31eff';
-            String header = '--'+boundary+'\nContent-Disposition: form-data; name="file"; filename="'+file_name+'";\nContent-Type: application/octet-stream';
-            String footer = '--'+boundary+'--';             
-            String headerEncoded = EncodingUtil.base64Encode(Blob.valueOf(header+'\r\n\r\n'));
-            while(headerEncoded.endsWith('='))
-            {
-                header+=' ';
-                headerEncoded = EncodingUtil.base64Encode(Blob.valueOf(header+'\r\n\r\n'));
+        private static map<string, string> parseJSONToMap1(string JSONValue){
+            JSONParser parser = JSON.createParser(JSONValue);
+            map<string, string> jsonMap = new map<string, string>();
+            string keyValue = '';
+            string tempValue = '';
+            while (parser.nextToken() != null) {
+                if(parser.getCurrentToken() == JSONToken.FIELD_NAME){
+                    keyValue = parser.getText();
+                    parser.nextToken();
+                    tempValue = parser.getText();
+                    jsonMap.put(keyValue, tempValue);            
+                }
             }
-            String bodyEncoded = EncodingUtil.base64Encode(file_body);
-            Blob bodyBlob = null;
-            String last4Bytes = bodyEncoded.substring(bodyEncoded.length()-4,bodyEncoded.length());
-
-            if(last4Bytes.endsWith('==')) {
-                last4Bytes = last4Bytes.substring(0,2) + '0K';
-                bodyEncoded = bodyEncoded.substring(0,bodyEncoded.length()-4) + last4Bytes;
-                String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
-                bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);
-            } else if(last4Bytes.endsWith('=')) {
-                last4Bytes = last4Bytes.substring(0,3) + 'N';
-                bodyEncoded = bodyEncoded.substring(0,bodyEncoded.length()-4) + last4Bytes;
-                footer = '\n' + footer;
-                String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
-                bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);              
-            } else {
-                footer = '\r\n' + footer;
-                String footerEncoded = EncodingUtil.base64Encode(Blob.valueOf(footer));
-                bodyBlob = EncodingUtil.base64Decode(headerEncoded+bodyEncoded+footerEncoded);  
-            }
-
-            return bodyBlob;
+            return jsonMap;
         }
          /** 
          Name: deleteFileApex,
@@ -318,79 +254,45 @@
         Return Type:Boolean
         **/
         @AuraEnabled
-        public static Boolean deleteFileDropbox(){
-            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+        public static Boolean deleteFileDropbox(String path){
+            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
             String accessToken=integration.Access_Token__c;
             String endPoint = 'https://api.dropboxapi.com/2/files/delete_v2';
-            String body = '{"path": "/Test"}';
-            Http http = new Http();
-            HttpRequest req = new HttpRequest();
-            req.setEndpoint(endpoint);
-            req.setHeader('Authorization', 'Bearer '+accessToken);
-            req.setHeader('Content-Type', 'application/json');
-            req.setMethod('POST');
-            req.setBody(body);
-            HttpResponse res = http.send(req);
-            system.debug(res);
+            String body = '{"path": "'+path+'"}';
+            Map<String,String> headers=new Map<String,String>();
+            headers.put('content-type','application/Json');
+            headers.put('Authorization','Bearer '+integration.Access_Token__c);
+            String method='POST';
+            HttpResponse response = ServiceClass.requestDropBox(endPoint,method,headers,body);
             Map<string, string> jsonDataMap = new Map<string, string>();
-            jsonDataMap = parseJSONToMap(res.getBody());
+            jsonDataMap = parseJSONToMap(response.getBody());
             if(jsonDataMap.containsKey('error')){
                 return false;
-                // isError = true;
-                // errorMessage = 'Delete Folder Process failed!!';
             }
             else {
                 return true;
-                // successMessage = 'Folder Deleted Successfully!!';
-                // isSuccess = true;
             }
         }
-        // public static Boolean deleteFileDropbox(String StringID,String fileType) {   
-        //     fileType=fileType+'s';
-        //     Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
-        //     String accessToken=integration.Access_Token__c;
-        //     HttpRequest req = new HttpRequest();
-        //     req.setEndpoint('https://api.box.com/2.0/'+fileType+'/'+StringID);
-        //     req.setMethod('DELETE');
-        //     req.setHeader('content-type', 'application/Json');
-        //     req.setHeader('Authorization','Bearer '+accessToken);
-        //     req.setHeader('Accept', 'application/json');
-        //     req.setTimeout(60*1000);
-        //     Http http=new Http();
-        //     HttpResponse response = http.send(req);
-        //     if(response.getStatusCode()==204){
-        //         return true;
-        //     }
-        //     else{
-        //         System.debug('Error: '+ response.getStatusCode()+' '+response.getStatus());
-        //         return false;
-        //     }
-        // }
-
          /** 
          Name: downloadFile,
-        description: download file  ,
+        description: download file,
         Param:StringID,
         Return Type:String
         **/
         @AuraEnabled
-        public static String downloadFile(String StringID){
-            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+        public static String downloadFile(String path){
+            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
             String accessToken=integration.Access_Token__c;
-            if(StringID == null){
-                return null;
-            }
-            Http http = new Http();
-            HttpRequest req = new HttpRequest();
-            req.setMethod('GET');
-            req.setEndpoint('https://api.box.com/2.0/files/'+StringID+'/content');
-            req.setHeader('Content-Type', 'application/json');
-            req.setHeader('Authorization', 'Bearer ' + accessToken);
-            req.setHeader('Accept', 'application/json');
-            req.setTimeout(60 * 1000);
-            HttpResponse resp = null;
-            resp = http.send(req);
-            return resp.getHeader('location');
+            String endPoint = 'https://api.dropboxapi.com/2/files/get_temporary_link';
+            String body = '{"path": "'+path+'"}';
+            Map<String,String> headers=new Map<String,String>();
+            headers.put('content-type','application/Json');
+            headers.put('Authorization','Bearer '+integration.Access_Token__c);
+            String method='POST';
+            HttpResponse res = ServiceClass.requestDropBox(endPoint,method,headers,body);
+            Map<String,object> responseMap =(Map<String,object>)JSON.deserializeUntyped(res.getBody());  
+
+            return (String)responseMap.get('link');
         }
         /**
         Name:WrapperGoogleDrive
@@ -405,5 +307,7 @@
             public String mimiType{get;set;}
             @AuraEnabled
             public Boolean folderOrFile{get;set;}
+            @AuraEnabled
+            public String pathDisplay{get;set;}
         }
     }   

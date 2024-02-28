@@ -86,19 +86,18 @@
                 var status = response.getState();
                	if(status === "SUCCESS"){
                     var accessToken = response.getReturnValue();
-                    if(accessToken!=null){
-                        var action  = component.get("c.getAllFilesFromGoogleDrive");
-                        action.setCallback(this, function(response){
-                            var status = response.getState();
-                            if(status === "SUCCESS"){
-                                var filesData = response.getReturnValue();
-                                component.set('v.files',filesData);
-                            }
-                        });
-                        $A.enqueueAction(action);
-                    }
-                    component.set("v.accessToken", accessToken);
-                    component.set("v.access", accessToken==true?'Authenticated..':'Not Authenticated..');
+                    this.getFiles();
+                    // if(accessToken!=null){
+                    //     var action  = component.get("c.getAllFilesFromGoogleDrive");
+                    //     action.setCallback(this, function(response){
+                    //         var status = response.getState();
+                    //         if(status === "SUCCESS"){
+                    //             var filesData = response.getReturnValue();
+                    //             component.set('v.files',filesData);
+                    //         }
+                    //     });
+                    //     $A.enqueueAction(action);
+                    // }
                 }
             });
             

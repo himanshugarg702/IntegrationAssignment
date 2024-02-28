@@ -44,7 +44,6 @@
                             <lightning:icon iconName="utility:open_folder" alternativeText="Approved" title="Approved" />
                         </aura:if>
                         <aura:if isTrue="{!file.mimiType=='text/csv'}" >
-                            <!-- <lightning:icon iconName="doctype:audio" alternativeText="Audio file" title="Audio" /> -->
                             <lightning:icon iconName="doctype:csv" alternativeText="Approved" title="Approved" />
                         </aura:if>
                         <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.spreadsheet'}" >
@@ -86,8 +85,6 @@
             </aura:iteration>
         </table>
     </div>
-    <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
-    <!-- <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload File" multiple="false"/> -->
     <div style="display: flex; flex-direction: row; margin-top:4rem;">
         <lightning:button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick="{!c.createNewFolder}" ></lightning:button>
         <lightning:fileUpload label="Attach receipt"

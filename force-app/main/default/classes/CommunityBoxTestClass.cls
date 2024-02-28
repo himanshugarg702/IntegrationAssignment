@@ -60,13 +60,15 @@ public with sharing class CommunityBoxTestClass {
         Integration__c getAccessToken=CommunityBoxApiIntegration.retrieveBoxAccessToken(googleDriveIntegration);
         Test.stopTest();
     }
-    // @isTest 
-    // static void uploadFile(){
-    //     Test.setMock(HttpCalloutMock.class, new MockTestClass());
-    //     String url=CommunityBoxApiIntegration.createAuthURL();
-    //     String testAccessToken=CommunityBoxApiIntegration.getAccessToken(url);
-    //     Test.startTest();
-    //     String getAccessToken=CommunityBoxApiIntegration.uploadFile('hello','123','456','image/jpeg');
-    //     Test.stopTest();
-    // }
+    @isTest 
+    static void uploadFile(){
+        Test.setMock(HttpCalloutMock.class, new MockTestClassBox());
+        String url=CommunityBoxApiIntegration.createAuthURL();
+        String testAccessToken=CommunityBoxApiIntegration.getAccessToken(url);
+        MockTestClassBox.insertFileAsContent();
+        ContentVersion cv=[SELECT VersionData,FileType,ContentDocumentId FROM ContentVersion LIMIT 1];
+        Test.startTest();
+        String getAccessToken=CommunityBoxApiIntegration.uploadFile((String)cv.ContentDocumentId,'hello','image/jpeg','0');
+        Test.stopTest();
+    }
 }

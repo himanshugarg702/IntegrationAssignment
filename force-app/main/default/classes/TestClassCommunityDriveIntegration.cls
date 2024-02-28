@@ -1,13 +1,9 @@
 @isTest 
 public with sharing class TestClassCommunityDriveIntegration {
     @isTest 
-    static void getAllObjects(){
+    static void checkUserIsCreatedOrNot(){
         Test.startTest();
         CommunityAssignmentClassGoogleDrive.checkUserCreatedOrNot();
-        // Map<String,String> result1 = KanBanViewAssignment.allObject();
-        // System.assertEquals(true,result1!=null);
-        // Map<String,String> result2 = KanBanViewAssignment.allObject();
-        // System.assertEquals(false,result2.size()==null);
         Test.stopTest();
     }
     @isTest 
@@ -69,21 +65,10 @@ public with sharing class TestClassCommunityDriveIntegration {
         Test.setMock(HttpCalloutMock.class, new MockTestClass());
         String url=CommunityAssignmentClassGoogleDrive.createAuthURL();
         String testAccessToken=CommunityAssignmentClassGoogleDrive.getAccessToken(url);
+        MockTestClass.insertFileAsContent();
+        ContentVersion cv=[SELECT VersionData,FileType,ContentDocumentId FROM ContentVersion LIMIT 1];
         Test.startTest();
-        String getAccessToken=CommunityAssignmentClassGoogleDrive.uploadFile('hello','123','456','image/jpeg');
+        String getAccessToken=CommunityAssignmentClassGoogleDrive.uploadFile('hello',(String)cv.ContentDocumentId,'root','image/jpeg');
         Test.stopTest();
     }
-    // @isTest 
-    // static void getAccesssToken() {
-       
-    //     HttpResponse res = CommunityAssignmentClassGoogleDrive.getAccessToken();
-        
-    //     // Verify response received contains fake values
-    //     String contentType = res.getHeader('Content-Type');
-    //     System.assert(contentType == 'application/x-www-form-urlencoded');
-    //     String actualValue = res.getBody();
-    //     String expectedValue = '{"example":"test"}';
-    //     System.assertEquals(actualValue, expectedValue);
-    //     System.assertEquals(200, res.getStatusCode());
-    // }
 }

@@ -97,42 +97,6 @@
         $A.enqueueAction(action);
     },
     /** 
-     Name: handleFilesChange,
-     Param:component, event, helper
-     Return Type:null
-     description:if file is upload this method called
-    **/
-    handleFilesChange: function(component, event, helper) {
-       var fileInput = event.getSource().get('v.files');
-        var file = fileInput[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function() {
-                var fileContent = reader.result.split(',')[1]; // Extract base64 content
-                var action = component.get("c.uploadFile");
-                action.setParams({
-                    "fileName": file.name || 'Untitled', // Use file.name if available, otherwise fallback to 'Untitled'
-                    "accessToken": component.get('v.accessToken'),
-                    "fileContent": fileContent // This should be the Blob content, not a String
-                });
-                action.setCallback(this, function(response) {
-                    var status = response.getState();
-                    if (status === "SUCCESS") {
-                        console.log('File uploaded successfully');
-                                helper.getFiles(component,event,helper);
-
-                        // Handle success if needed
-                    } else {
-                        console.error('Error uploading file: ' + response.getError()[0].message);
-                        // Handle error if needed
-                    }
-                });
-                $A.enqueueAction(action);
-            };
-            reader.readAsDataURL(file);
-        }
-    },
-    /** 
      Name: createNewFolder,
      Param:component, event, helper
      Return Type:null

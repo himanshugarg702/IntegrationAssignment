@@ -57,7 +57,7 @@
         @AuraEnabled
         public static Boolean newFolder(String folderName,String fileId) {
             String parentFolderId=fileId;
-            Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
+            Integration__c integration=[Select id,Access_Token__c,Refresh_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
             String accessToken=integration.Access_Token__c;
             HttpRequest req = new HttpRequest();
             req.setMethod('POST');     
@@ -103,6 +103,7 @@
             responseText = res.getBody();
             Map<String,object> responseMap =(Map<String,object>)JSON.deserializeUntyped(responseText) ;  
             userData.Access_Token__c=(String)responseMap.get('access_token');
+            userData.Refresh_Token__c=(String)responseMap.get('refresh_token');
             userData.ExpiresIn__c=DateTime.valueOf(System.now().addSeconds((Integer)responseMap.get('expires_in')));
             return userData;
         }
@@ -232,6 +233,12 @@
                     return 'Error: ' + res.getStatus() + ', ' + res.getBody();
                 }
         }
+          /** 
+         Name: base64EncodeFileContent,
+        description:reference function of upload file method for make content in a format of binary ,
+        Param:file_body,file_name
+        Return Type:blob
+        **/
         public static blob base64EncodeFileContent(Blob file_body, String file_name){
                 Blob bodyBlob = null;    
                 String boundary = '----------------------------741e90d31eff';

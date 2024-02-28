@@ -57,9 +57,7 @@
                         <aura:if isTrue="{!file.mimiType!='folder'}" >
                             <td >
                                 <!-- "{!'/' + v.record.Id} -->
-                            
-                                    <a href="{!file.alternativeLink}" target="_blank" style="cursor: pointer; text-decoration:none;" id="{!file.Id}" >{!file.name}</a>
-                                
+                                <a href="{!'https://app.box.com/file/'+file.Id}" target="_blank" style="cursor: pointer; text-decoration:none;" id="{!file.Id}" >{!file.name}</a>
                             </td>
                         </aura:if>
             <aura:if isTrue="{!file.mimiType!='folder'}" >
@@ -76,9 +74,6 @@
                 <lightning:icon iconName="action:delete" size="small" alternativeText="Approved" title="Approved" style="cursor: pointer;"/>
             </td>
             </tr>
-            <!-- <aura:if isTrue="{!file.mimiType=='application/vnd.google-apps.folder'}" >
-                folder
-            </aura:if> -->
             </aura:iteration>
             
         </table>

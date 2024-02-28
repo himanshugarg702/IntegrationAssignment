@@ -4,8 +4,8 @@ Description:In this class implemented integration with google drive getting acce
 **/
 public class CommunityAssignmentClassGoogleDrive {
 
-        private static string key = '116017441019-g59jsa3g2k5ehr4dln4mrvske5t062q4.apps.googleusercontent.com';//Drives__mdt.getInstance('box').AppKey__c
-        private static string secert = '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';
+        private static string key = Drives__mdt.getInstance('GoogleDrive').AppKey__c;
+        private static string secert = Drives__mdt.getInstance('GoogleDrive').AppSecret__c;
         private static string redirect_uri = 'https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=2';
         private static string authUrl='https://accounts.google.com/o/oauth2/v2/auth';
         private static string scope='https://www.googleapis.com/auth/drive';
@@ -94,10 +94,6 @@ public class CommunityAssignmentClassGoogleDrive {
                 integration=retrieveGoogleAccessToken(integration);
             }
             List<WrapperGoogleDrive> fileList=new List<WrapperGoogleDrive>();
-            // String method='GET';
-            // String contentType='application/Json';
-            // String endPoint='https://www.googleapis.com/drive/v2/files';
-            // String header=integration.Access_Token__c;
             HttpRequest req = new HttpRequest();
                 req.setEndpoint('https://www.googleapis.com/drive/v2/files?q=\''+fileId+'\'%20in%20parents%20and%20trashed%3Dfalse');
             req.setMethod('GET');
@@ -126,10 +122,6 @@ public class CommunityAssignmentClassGoogleDrive {
                 return fileList;
             }
             else{ 
-                
-                // integration=retrieveGoogleAccessToken(integration);
-                // update integration;
-                // getAllFilesFromGoogleDrive();
                 System.debug('Error: '+ response.getStatusCode()+' '+response.getStatus());
 
                 return null;
