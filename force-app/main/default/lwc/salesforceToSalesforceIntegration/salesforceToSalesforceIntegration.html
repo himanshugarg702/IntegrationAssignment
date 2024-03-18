@@ -1,4 +1,9 @@
 <template>
+    <div if:true={showSpinner}>
+        <lightning-spinner
+            alternative-text="Loading..." variant="brand" class="slds-is-fixed">
+        </lightning-spinner>
+    </div>
     <div class="slds-scrollable_y" style="margin-top: 2rem;height: 450px;">
         <table  style="position:relative;">
             <tr style="font-size: 1rem;  font-weight: bold;">
