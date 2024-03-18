@@ -37,21 +37,13 @@ export default class BoxAPILWC extends LightningElement {
     constructor(){
         super();
         this.handleSpinner();
-        var url = window.location.href;
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        var code = getParameterByName('code',url);
+        var startingURL=new URL(window.location.href);
+            var code = startingURL.searchParams.get('code');
         if(code !== undefined && code!==null) {
             getAccessToken({code:code})
             .then((data) => {
                 this.getFiles();
+               window.location.href-'https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=43259';
             })
             .catch((error) => {
                 console.log(error);

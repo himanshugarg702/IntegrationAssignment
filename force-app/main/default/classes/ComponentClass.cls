@@ -72,6 +72,7 @@ public class ComponentClass {
     public list<String> tempFieldList{get;set;}
     // constructor
     public ComponentClass(){
+        System.debug('hello10');
         hideTableOnTheBasisOfData=false;
         alphaList=new list<String>();
         String characterList= System.Label.AlphaList;
@@ -103,6 +104,9 @@ public class ComponentClass {
 **/
     
     public void mainPage(){
+        System.debug('hhfh');
+        delCsvButttonDisable=true;
+
         caseCon='';
         if(selectObj=='Case'||selectObj=='Contact'){
             caseCon=selectObj;                          //
@@ -257,7 +261,7 @@ public class ComponentClass {
      Param:null,
      Return Type: Null
 **/
-    public void seeDataAccordingToRecordPerPage(){
+    public void seeDataAccordingToRecordPerPage()  {
        
         if(selectedOption=='5'){
             LimitSize=5;
@@ -271,10 +275,12 @@ public class ComponentClass {
         else if(selectedOption=='20'){
             LimitSize=20;
         }
+        System.debug(LimitSize);
+        System.debug(selectedOption);
         PageNumber=1;
         dataListToShow.clear();
         if(tempBool==true){
-            
+            System.debug('hello');
             for(Integer i=0;i<LimitSize;i++){
                 if(i>resultSize){
                     break;
@@ -286,7 +292,8 @@ public class ComponentClass {
         }
        
         else{
-            
+            System.debug(resultSize);
+            System.debug('hello2');
             for(Integer i=0;i<LimitSize;i++){
                 if(i>=resultSize){
                     break;
@@ -294,6 +301,7 @@ public class ComponentClass {
                 dataListToShow.add(dataForManipulatingDataList.get(i));
             }
         }
+        System.debug(dataListToShow.size());
         if(dataListToShow.size()==0){
             ApexPages.addmessage(new ApexPages.message(ApexPages.severity.CONFIRM,' Data Not Found'));
             
@@ -442,7 +450,7 @@ public class ComponentClass {
      description: method for column sorting,
      Param:null,
      Return Type: Null
-**/
+     **/
 
     public void viewData(){
         sortFullExp = sortExpression  + ' ' + sortDirection;
@@ -459,31 +467,45 @@ public class ComponentClass {
         changeList();
         
     }
-      /** 
+    /** 
      Name: downloadCSV,
      description: for download csv data ,
      Param:null,
      Return Type: Null
-**/
+    **/
 
     // 
     public void downloadCSV(){
         csvButton=String.join(nameFieldValues,',')+'\n';
-        for(Wrapper obj:dataListToShow){
-            if(obj.check==true){
-                for(Integer i=0;i<nameFieldValues.size();i++){
-                    csvButton+=obj.acc.get(nameFieldValues[i])+',';
+        for(Wrapper obj:dataListToShow) {
+            if(obj.check==true) {
+                for(Integer i=0;i<nameFieldValues.size();i++) {
+                    if(nameFieldValues[i]=='Description') {
+                        csvButton+=obj.acc.get(nameFieldValues[i].escapeCsv())+',';
+                    }
+                    else{
+                        csvButton+=obj.acc.get(nameFieldValues[i])+',';
+                    }
                 }
                 csvButton=csvButton+'\n';
             }
         }
     }
     /** 
+     Name: newRecordCreate,
+     description: when create new record ,
+     Param:null,
+     Return Type: Pagereference
+    **/
+    public PageReference newRecordCreate(){
+        return new PageReference('/'+Schema.getGlobalDescribe().get(selectObj).getDescribe().getKeyPrefix()+'/e');
+    }
+    /** 
      Name: maintainCheckBox,
      description: method for disable downlaodcsv button and delete selected button ,
      Param:null,
      Return Type: Null
-**/
+    **/
     public void maintainCheckBox(){
         delCsvButttonDisable=false;
         Integer checkCount=0;

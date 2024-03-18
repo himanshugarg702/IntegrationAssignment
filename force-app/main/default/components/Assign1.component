@@ -20,13 +20,14 @@
     <apex:pageBlock id="hello1" rendered="{!IF(dataListToShow!=null,true,false)}"> 
         <div align="right" style="display: flex;  justify-content:  space-between;">
                  <div>
-                    <apex:commandLink action="{!URLFOR($Action[selectObj].New)}"  status="pageStatus" target="_blank" style="text-decoration:none;" >
+                    <!-- action="{!URLFOR($Action[selectObj].New)}" -->
+                    <apex:commandLink action="{!newRecordCreate}"  status="pageStatus" target="_blank" style="text-decoration:none;" >
                         <apex:commandButton value="New Record"/>
                     </apex:commandLink>
-                    <apex:commandLink action="{!deleteSelected}"  style="text-decoration:none;" status="pageStatus" >
+                    <apex:commandLink action="{!deleteSelected}"  style="text-decoration:none;" status="pageStatus" reRender="hello,hello1">
                         
-                        <apex:commandButton status="pageStatus"  value="Delete Selected" styleClass="delButton" disabled="{!delCsvButttonDisable}" />
-                        <apex:actionSupport event="oncomplete"   reRender="hello1" oncomplete="childCheckBox()" />
+                        <apex:commandButton status="pageStatus"  value="Delete Selected" styleClass="delButton" disabled="{!delCsvButttonDisable}" reRender="hello,hello1"/>
+                        <apex:actionSupport event="oncomplete" action="{!mainPage}" reRender="hello1" oncomplete="childCheckBox()" />
                         
                     </apex:commandLink>
                     <apex:commandLink style="text-decoration:none;"  reRender="hello1">
@@ -47,6 +48,7 @@
                 <apex:column headerValue="Name">
                     <apex:facet name="header">
                         <apex:inputCheckbox styleClass="parent" onchange="parentCheckBox(this);"/>
+                        <!-- <apex:actionSupport event="onclick" action="{!maintainCheckBox}" reRender="hello1" /> -->
                     </apex:facet>
                     <apex:inputCheckbox value="{!rec.check}" styleClass="child" onchange="childCheckBox(this);" >
                      
@@ -80,12 +82,13 @@
                             </apex:facet>
                         </apex:commandLink>
                     </apex:column>
-                </a>
+                </a> 
                 <div>
                     <apex:repeat value="{!tempFieldList}" var="FieldLable"  >
+                        <!-- value="{!rec.acc[FieldLable]} -->
                         <apex:column value="{!rec.acc[FieldLable]}" styleClass="column" rendered="{!(FieldLable != 'Name')}">
                             <apex:facet name="header">   
-                                <apex:commandLink action="{!ViewData}" value="{!FieldLable}{!IF(sortExpression==FieldLable,IF(sortDirection='ASC','▲','▼'),'')}" reRender="hello" >
+                                <apex:commandLink action="{!ViewData}" value="{!$objectType[selectObj].fields[FieldLable].label}{!IF(sortExpression==FieldLable,IF(sortDirection='ASC','▲','▼'),'')}" reRender="hello" >
                                     <apex:param name="bb" value="{!FieldLable}" assignTo="{!sortExpression}" />
                                 </apex:commandLink>
                             </apex:facet>
@@ -116,8 +119,8 @@
                     <apex:commandButton value="Last Page" oncomplete="childCheckBox()" id="lp"  rerender="table2,hello,pageNum,n,lp,p,fp" action="{!lastPage}" status="pageStatus" disabled="{!PageNumber==CEILING(ResultSize / LimitSize)}"/>
                 </td>
                 <td>
-                    Page:<apex:inputText value="{!PageNumber}" id="pageNum" style="width:1rem"  >
-                    <apex:actionSupport event="onchange" action="{!valueSet}" status="pageStatus"  />
+                    Page:<apex:inputText value="{!PageNumber}" id="pageNum" style="width:1rem" >
+                    <apex:actionSupport event="onchange" action="{!valueSet}" status="pageStatus" oncomplete="childCheckBox()" rerender="table2,hello,pageNum,n,lp,p,fp" />
                     </apex:inputText>
                     <apex:outputText value=" of {!CEILING(ResultSize / LimitSize)}" id="c" />
                 </td>

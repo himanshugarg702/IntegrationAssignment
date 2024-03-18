@@ -6,23 +6,12 @@
      description: when component render this method initialize and check if user is already present call files else called authurl
     **/
     doInit : function(component, event, helper) {
-       	var url = window.location.href;
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-                // console.log('===reges==',reges);
-
-            console.log('===results==',results);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        var code = getParameterByName('code');
+        var startingURL=new URL(window.location.href);
+        var code = startingURL.searchParams.get('code');
         if(code !== undefined && code!==null) {
             console.log('code');
               helper.getAccessToken(component,code,helper);
+              window.location.href  ='https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=3';
           }
         else{
                 var action  = component.get("c.checkUserCreatedOrNot");
@@ -58,7 +47,8 @@
         var selectedType = selectedItem.dataset.type;
         var action  = component.get("c.deleteFileBox");
         action.setParams({
-            "StringID":selectedField
+            "StringID":selectedField,
+            "fileType":selectedType
         })
         action.setCallback(this, function(response){
             var status = response.getState();

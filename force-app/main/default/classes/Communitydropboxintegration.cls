@@ -10,7 +10,7 @@
         private static string secert =Drives__mdt.getInstance('dropbox').AppSecret__c;
         private static string redirect_uri = 'https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=43259';
         private static string authUrl='https://www.dropbox.com/oauth2/authorize';
-        private static string scope='files.metadata.read file_requests.read files.content.read files.content.write file_requests.write';//'file_requests.read';//'files.metadata.read';
+        private static string scope='files.metadata.read file_requests.read files.content.read files.content.write file_requests.write';
         private static string tokenUrl='https://www.dropbox.com/oauth2/token';
         /** 
         Name: checkUserCreatedOrNot,
@@ -128,10 +128,10 @@
                 }
             }
             Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Dropbox']; 
-            if(rootFolderId=='/'){
+            if(rootFolderId=='/') {
                 rootFolderId='';
             }
-            if(integration.ExpiresIn__c<System.now()){
+            if((integration.ExpiresIn__c<System.now()||integration.Access_Token__c==null)&&integration.Refresh_Token__c!=null){
                 integration=retrieveDropBoxAccessToken(integration);
             }
             List<WrapperBox> fileList=new List<WrapperBox>();

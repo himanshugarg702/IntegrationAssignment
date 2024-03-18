@@ -39,9 +39,26 @@ public with sharing class ServiceClass {
           }
           req.setBody(body);
           req.setTimeout(60*1000);
+          // if(tempBlob!=null){
+          //   req.setBodyAsBlob(tempBlob);
+          // }
           Http callout = new Http();
           HttpResponse response = callout.send(req);
           System.debug(response);
           return response;
   }
+  public static HttpResponse paymentIntegration(String endPoint,String method,Map<String,String> headers,String body){
+    HttpRequest req = new HttpRequest();
+      req.setMethod(method);
+      req.setEndpoint(endPoint);
+      for(String header:headers.keySet()){
+        req.setHeader(header,headers.get(header));
+      }
+      req.setBody(body);
+      req.setTimeout(60*1000);
+      Http callout = new Http();
+      HttpResponse response = callout.send(req);
+      System.debug(response);
+      return response;
+}
 }

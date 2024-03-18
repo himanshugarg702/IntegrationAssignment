@@ -116,7 +116,7 @@
         @AuraEnabled
         public static List<WrapperBox> getAllFilesFromBox(String fileId) {   
             Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
-            if(integration.ExpiresIn__c<System.now()){
+            if((integration.ExpiresIn__c<System.now()||integration.Access_Token__c==null)&&integration.Refresh_Token__c!=null){
                 integration=retrieveBoxAccessToken(integration);
             }
             List<WrapperBox> fileList=new List<WrapperBox>();
@@ -283,7 +283,7 @@
             Integration__c integration=[Select id,Access_Token__c,Contact__c,Type_Integration__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Box']; 
             String accessToken=integration.Access_Token__c;
             HttpRequest req = new HttpRequest();
-            req.setEndpoint('https://api.box.com/2.0/'+fileType+'/'+StringID);
+            req.setEndpoint('https://api.box.com/2.0/'+fileType+'/'+StringID+'?recursive=true');
             req.setMethod('DELETE');
             req.setHeader('content-type', 'application/Json');
             req.setHeader('Authorization','Bearer '+accessToken);
@@ -291,7 +291,7 @@
             req.setTimeout(60*1000);
             Http http=new Http();
             HttpResponse response = http.send(req);
-            if(response.getStatusCode()==204){
+            if(response.getStatusCode()==204) {
                 return true;
             }
             else{

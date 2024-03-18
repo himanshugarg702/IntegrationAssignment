@@ -1,0 +1,83 @@
+<template>
+    <!-- <lightning-accordion class="example-accordion"
+                         onsectiontoggle={handleToggleSection}
+                         active-section-name="B">
+        <lightning-accordion-section name="A" label="select object and fields"> -->
+            <lightning-select
+                    name="tickets"
+                    label="Select Object"
+                    value={selectedObject}
+                    options={listOfObject}
+                    onchange={handleChange}
+                    required>
+            </lightning-select>  
+            <lightning-button  
+                variant="brand" 
+                label="Reset" 
+                onclick={reset} disabled={resetButton}>
+            </lightning-button>
+            <template if:true={showFields}>
+                <lightning-dual-listbox
+                    class="slds-size--8-of-12"
+                    id="selectOptions"
+                    name="Select Options"
+                    label="Select Options"
+                    source-label="Available Options"
+                    selected-label="Selected Options"
+                    options={listOfFields}
+                    value={listOfFields}
+                    required-options={requiredOptions}
+                    onchange={handleChangeSelectedFields}>
+                </lightning-dual-listbox>
+                <lightning-button  
+                    variant="brand" 
+                    label="Process" 
+                    onclick={processGetRecords}>
+                </lightning-button>
+            </template>
+        <!-- </lightning-accordion-section>
+    </lightning-accordion> -->
+    <template if:true={showTable}>
+        <lightning-input type="search" onchange={handleKeyChange} class="slds-m-bottom_small slds-size--1-of-4" label="Search" value={searchKey} placeholder="Type Account Name.."></lightning-input>
+
+        <div style="height: 300px;">
+            <lightning-datatable
+                    key-field="id"
+                    data={records}
+                    columns={selectedFields}
+                    hide-checkbox-column
+                    default-sort-direction={defaultSortDirection}
+                    sorted-direction={sortDirection}
+                    sorted-by={sortedBy}
+                    selected-rows={selectedRows}
+                    onsort={onHandleSort}
+                    onrowselection={getSelectedName}>
+            </lightning-datatable>
+        </div>
+        <div class="tableBottom">
+            <div>
+                <lightning-combobox
+                    name="progress"
+                    value={pageSize}
+                    placeholder="Select Progress"
+                    dropdown-alignment="bottom-left"
+                    options={options}
+                    onchange={changePageSize}>
+                </lightning-combobox>
+            </div>
+            <div>
+                <lightning-button disabled={firstPageAndPrev} label="First" title="Non-primary action" onclick={firstPage} class="slds-m-left_x-small"></lightning-button>
+                <!-- <lightning-button disabled={firstPageAndPrev} label="Prev" title="Non-primary action" onclick={prevPage} class="slds-m-left_x-small"></lightning-button> -->
+                <template for:each={listOfButtonsToShow} for:item="option">
+                    <lightning-button data-tit={option} key={option} label={option}   id={option} onclick={handleRecordButton}  title="Non-primary action" class="slds-m-left_x-small"></lightning-button>
+                </template>
+                <!-- <lightning-button disabled={nextPageAndLast} label="Next" title="Non-primary action" onclick={nextPage} class="slds-m-left_x-small"></lightning-button> -->
+                <lightning-button disabled={nextPageAndLast} label="Last" title="Non-primary action" onclick={lastPage} class="slds-m-left_x-small"></lightning-button>
+            </div>
+            <div style="display: flex;">
+                <p class="slds-accordion__summary-heading slds-m-horizontal--small fonts"> Total Records:<span>{totalRecords}</span></p>
+                <p class="slds-accordion__summary-heading fonts">Page Number: <span>{pageNumber}</span>/<span>{totalPages}</span></p>
+            </div>
+        </div>
+    </template>
+</template>

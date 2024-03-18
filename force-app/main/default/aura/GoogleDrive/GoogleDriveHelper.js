@@ -91,6 +91,7 @@
                	if(status === "SUCCESS"){
                     var accessToken = response.getReturnValue();
                     if(accessToken!=null){
+                        this.getFiles();
                         var action  = component.get("c.getAllFilesFromGoogleDrive");
                         action.setCallback(this, function(response){
                             var status = response.getState();
@@ -103,6 +104,7 @@
                         $A.enqueueAction(action);
                     }
                     component.set("v.access", accessToken==true?'Authenticated..':'Not Authenticated..');
+                    
                 }
             });
             

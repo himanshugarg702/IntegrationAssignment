@@ -55,10 +55,6 @@ public class CommunityAssignmentClassGoogleDrive {
         **/
         @AuraEnabled
         public static String getAccessToken(String code) {
-            // String method='POST';
-            // String contentType='application/x-www-form-urlencoded';
-            // String endPoint=tokenUrl;
-            //Getting access token from google
             HttpRequest req = new HttpRequest();
             req.setMethod('POST');
             req.setEndpoint(tokenUrl);
@@ -90,7 +86,7 @@ public class CommunityAssignmentClassGoogleDrive {
         @AuraEnabled
         public static Object getAllFilesFromGoogleDrive(String fileId) {   
             Integration__c integration=[Select id,Access_Token__c,ExpiresIn__c,Refresh_Token__c,Contact__c from Integration__c where Contact__c=:UserInfo.getName() AND Type_Integration__c = 'Google Drive']; 
-            if(integration.ExpiresIn__c<System.now()){
+            if((integration.ExpiresIn__c<System.now()||integration.Access_Token__c==null)&&integration.Refresh_Token__c!=null){
                 integration=retrieveGoogleAccessToken(integration);
             }
             List<WrapperGoogleDrive> fileList=new List<WrapperGoogleDrive>();

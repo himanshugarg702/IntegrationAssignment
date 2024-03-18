@@ -45,8 +45,6 @@ public class KanBanViewAssignment {
     **/
     @AuraEnabled
     public static Map<String,String> allFields(String selectedObject) {
-
-      
         Map<String,String> listOfField = new Map<String,String>();
         if (selectedObject != null) {
             for (SObjectField sField : Schema.getGlobalDescribe().get(selectedObject).getDescribe().fields.getMap().values()) {
@@ -58,7 +56,6 @@ public class KanBanViewAssignment {
                 }
             }
         }
-    
         return listOfField;
     }
     /** 

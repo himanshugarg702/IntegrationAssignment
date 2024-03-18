@@ -33,6 +33,8 @@ public class PaginationVisualforceClass {
     public list<String> labelSendComponent{get;set;}
     //contructor
     public PaginationVisualforceClass(){
+        System.debug('hello11');
+
         processShow=true;
        
        

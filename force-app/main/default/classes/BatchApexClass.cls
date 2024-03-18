@@ -34,10 +34,10 @@ Database.Batchable<sObject>, Database.Stateful {
             Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{emailData});
         }
        public void execute(SchedulableContext ctx) {
-            BatchApexClass batch=new BatchApexClass();
+           // BatchApexClass batch=new BatchApexClass();
             // String sch = '0 0-26 14 * * ?';
             // String jobID = System.schedule('Remind Opp Owners', sch, Database.executeBatch(batch));
-            Database.executeBatch(batch);
+           // Database.executeBatch(batch);
           /*  BatchApexClass be=new BatchApexClass();
             String sch = '0 19 17 * * ?';
             System.schedule('Remind Opp Owners', sch,be);*/

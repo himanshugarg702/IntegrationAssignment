@@ -1,0 +1,90 @@
+<template>
+    <div if:true={showSpinner}>
+        <lightning-spinner
+            alternative-text="Loading..." variant="brand" class="slds-is-fixed">
+        </lightning-spinner>
+    </div>
+    <div class="slds-tabs_card" style="background: linear-gradient(90deg, rgba(49,18,25,1) 0%, rgba(49,18,25,1) 35%, rgba(73,44,10,1) 100%);height:100vh;">
+        <div class="slds-page-header" style="background-color: #ECE9EC;max-width: 600px; margin:auto;height: 31.2rem; ">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media" style="background-color: #DFDCDD;display: flex; flex-direction: column;">
+                        <div class="slds-media__body" style="padding-left: 1.75rem;width:100%;">
+                            <img src={imageForUI} alt="image .net" style="width:90%; height:8rem;padding-top: 1rem;"/>
+                        </div>
+                        <template if:true={showPaymentByCard}>
+                        <div style="padding-top: 2rem;">
+                            <div class="slds-var-p-around_small">
+                                    <lightning-layout multiple-rows>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                            <lightning-input name="cardNumber" class="fieldvalidate" type="Telephone"
+                                                             label="Card Number" required onchange={handleChange} maxlength="16" minlength="12" placeholder="5234-XXXX-XXXX-2321" >
+                                            </lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="3" large-device-size="3">
+                                            <lightning-combobox name="month" options={monthOptions} placeholder="Choose a month"
+                                                                label="Month" value={cardmMonth} required onchange={handleChange}>
+                                            </lightning-combobox>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="3" large-device-size="3">
+                                            <lightning-combobox name="year" options={yearOptions} placeholder="Choose a year"
+                                                                label="Year" value={cardYear} required onchange={handleChange}>
+                                            </lightning-combobox>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="6" large-device-size="6">
+                                            <lightning-input name="cvv" class="fieldvalidate" type="password" maxlength="4"
+                                                             label="CVV/CVC" required onchange={handleChange} placeholder="xxx">
+                                            </lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                            <!-- <lightning-input name="cardNumber" class="fieldvalidate" type="tel"
+                                                             label="Card Number" required onchange={handleChange} maxlength="16" minlength="12" placeholder="5234-XXXX-XXXX-2321">
+                                            </lightning-input> -->
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-large" size="12" medium-device-size="12" large-device-size="12">
+                                            <button type="button" class="buttonClass slds-button slds-button_success" onclick={handlePaymentByCard}> Place Order </button>
+                                        </lightning-layout-item>
+                                      
+                                    </lightning-layout>
+                            </div>
+                        </div>
+                        <div style="width: 100%;">
+                            <p style="text-align: center;">To pay using Echeck?<a style="text-align: center;padding-left: 0.3rem;" onclick={changeEcheckToCard}>Click Here</a></p>
+                        </div>
+                    </template>
+                    <template if:true={showPaymentByEcheck}>
+                        <div>
+                            <div class="slds-var-p-around_small">
+                                    <lightning-layout multiple-rows>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                            <lightning-input name="routingnumber" class="fieldvalidate" type="tel"
+                                                             label="Routing Number" required onchange={handleChange} maxlength="9" minlength="8" placeholder="121XXXXX">
+                                            </lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                            <lightning-input name="accountNumber" class="fieldvalidate" type="tel"
+                                                             label="Account Number" required onchange={handleChange} maxlength="12" minlength="8" placeholder="1231XXXXX">
+                                            </lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                            <lightning-input name="nameOnTheCard" class="fieldvalidate" type="tel"
+                                                             label="Name On The Card" required onchange={handleChange} maxlength="6" minlength="4" placeholder="Your Name">
+                                            </lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12">
+                                          <button type="button" class="buttonClass slds-button slds-button_success" onclick={handlePaymentByEcheck}> Place Order </button>
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                            </div>
+                        </div>
+                        <div style="width: 100%;">
+                            <p style="text-align: center;">To pay using Card?<a style="text-align: center;padding-left: 0.3rem;" onclick={changeEcheckToCard}>Click Here</a></p>
+                        </div>
+                    </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <br/>
+ 
+</template>

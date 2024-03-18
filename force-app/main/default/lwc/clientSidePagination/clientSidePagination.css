@@ -1,0 +1,8 @@
+.tableBottom{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.fonts{
+    font-weight: 700;
+}

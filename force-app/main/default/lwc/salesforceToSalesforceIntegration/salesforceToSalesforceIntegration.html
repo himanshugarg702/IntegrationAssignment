@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-scrollable_y" style="margin-top: 2rem;height: 450px;">
+        <table  style="position:relative;">
+            <tr style="font-size: 1rem;  font-weight: bold;">
+                <th>Title</th>
+                <th>Type</th>
+            </tr>
+                <template for:each={listOfFiles} for:item="file">
+                        <tr key={file.id}>
+                            <td>
+                                <a style="cursor: pointer;text-decoration:none;" >{file.Title}</a> 
+                            </td>
+                            <td>
+                                <a style="cursor: pointer;text-decoration:none;" >{file.FileType}</a> 
+                            </td>
+                        </tr>
+                </template>
+        </table>
+    </div>
+    <div style="display: flex; flex-direction: row;">
+                        <lightning-input name="file uploader"
+                                        onchange={handleUploadFinished} type="file"  >
+                        </lightning-input>
+    </div>
+</template>

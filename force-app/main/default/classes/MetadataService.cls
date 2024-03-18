@@ -13,6 +13,7 @@ public with sharing class MetadataService {
             insert integration;
         }
         if(recordSize.size()==1){
+            recordSize[0].Refresh_Token__c=(String)token.get('refresh_token');
             recordSize[0].Access_Token__c=(String)token.get('access_token');
             recordSize[0].ExpiresIn__c=DateTime.valueOf(System.now().addSeconds((Integer)token.get('expires_in')));
             update recordSize;
@@ -31,6 +32,7 @@ public with sharing class MetadataService {
             insert integration;
         }
         if(recordSize.size()==1){
+            recordSize[0].Refresh_Token__c=(String)token.get('refresh_token');
             recordSize[0].Access_Token__c=(String)token.get('access_token');
             recordSize[0].ExpiresIn__c=DateTime.valueOf(System.now().addSeconds((Integer)token.get('expires_in')));
             update recordSize;
@@ -49,6 +51,7 @@ public with sharing class MetadataService {
             insert integration;
         }
         if(recordSize.size()==1){
+            recordSize[0].Refresh_Token__c=(String)token.get('refresh_token');
             recordSize[0].Access_Token__c=(String)token.get('access_token');
             recordSize[0].ExpiresIn__c=DateTime.valueOf(System.now().addSeconds((Integer)token.get('expires_in')));
             update recordSize;

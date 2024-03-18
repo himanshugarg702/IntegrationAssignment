@@ -7,8 +7,8 @@
     <!-- <b>{!v.fieldName}-</b>{!v.fieldValue} -->
     <!-- {!v.fieldValue} -->
     <td>
-
-        <div class="slds-truncate" title="{!v.fieldName}"  ><b>{!v.fieldName}-</b>{!v.fieldValue}</div>
+{!v.fieldValue}
+        <!-- <div class="slds-truncate" title="{!v.fieldName}"  ><b>{!v.fieldName}-</b>{!v.fieldValue}</div> -->
     </td>
 
 </aura:component>

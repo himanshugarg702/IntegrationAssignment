@@ -51,7 +51,7 @@ width:10%;
     
     <apex:form id="form" style="background: white; border: none; width:100%; overflow:auto;">
         <apex:pageBlock >
-            <div style="display:flex;width:80%;  ">
+            <div style="display:flex;width:80%;">
                 <apex:outputLabel value=" Select Objects"  style=" font-size: 1.3rem; margin-right:2%; font-weight: bold;" />       
                 
                 <apex:selectList value="{!selectedObject}" size="1" style="width:30%;">

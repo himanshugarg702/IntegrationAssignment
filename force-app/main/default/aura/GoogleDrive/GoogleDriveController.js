@@ -6,20 +6,12 @@
      description: when component render this method initialize and check if user is already present call files else called authurl
     **/
     doInit : function(component, event, helper) {
-       	var url = window.location.href;
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        var code = getParameterByName('code');
+           var startingURL=new URL(window.location.href);
+            var code = startingURL.searchParams.get('code');
             if(code !== undefined && code!==null) {
-                  console.log('code');
                     helper.getAccessToken(component,code,helper);
+                    helper.getFiles(component,event,helper);
+                    window.location.href='https://briskminds-b3-dev-ed.develop.my.site.com/s/?tabset-f0cd9=2';
                 }
             else{
                     var action  = component.get("c.checkUserCreatedOrNot");
@@ -27,13 +19,10 @@
                         var status = response.getState();
                         if(status === "SUCCESS"){
                             var authUrl = response.getReturnValue();
-                            console.log(authUrl);
-                            console.log(code);
                             if(authUrl==true){
                                 helper.getFiles(component,event,helper);
                             }
                             else{
-                                console.log('hello world');
                                 helper.getdoAuth(component,event,helper);
                             }
                         }

@@ -65,25 +65,8 @@
     <!-- create folder card -->
     <div style="display: flex; flex-direction: row;">
         <lightning-button class="slds-m-left_x-small" variant="brand-outline" name="Create" label="create new folder" onclick={handleApexCallCreateFolder} style="margin-top: 1.4rem;;" ></lightning-button>
-        <!-- <lightning-card  variant="Narrow"  title="Box API For Upload Files" icon-name="standard:file">
-            <div class="slds-var-p-around_small">
-                <lightning-layout multiple-rows>
-                    <lightning-layout-item padding="around-small" size="12" medium-device-size="12" large-device-size="12"> -->
                         <lightning-input name="file uploader"
                                         onchange={handleUploadFinished} type="file"  >
                         </lightning-input>
-                    <!-- </lightning-layout-item>
-                </lightning-layout>
-            </div>
-        </lightning-card> -->
-    <!-- <lightning-file-upload
-        label="Attach receipt"
-        name="fileUploader"
-        accept={acceptedFormats}
-        record-id={myRecordId}
-        onuploadfinished={handleUploadFinished}
-        style="margin-left: 1rem;"
-    >
-    </lightning-file-upload> -->
     </div>
 </template>
